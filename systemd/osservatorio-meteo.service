@@ -1,0 +1,16 @@
+# Servizio "utente" di systemd che tiene sempre acceso il programma meteo.
+# NON copiarlo a mano: lo installa strumenti/installa.sh, che sostituisce
+# @CARTELLA_REPOSITORY@ con il percorso vero del repository.
+[Unit]
+Description=Stazione meteo dell'osservatorio (KStars/Ekos)
+After=default.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 @CARTELLA_REPOSITORY@/meteo/meteo_servizio.py
+# Se il programma si ferma per qualunque motivo, systemd lo riavvia dopo 10 s.
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=default.target

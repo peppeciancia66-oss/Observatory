@@ -1,0 +1,102 @@
+; =============================================================================
+;  meteo.ini  -  Configurazione della stazione meteo dell'osservatorio
+; =============================================================================
+;
+;  Come si modifica:
+;    1. apri il file con l'editor di testo (es. "Editor di testo" / xed);
+;    2. cambia SOLO il numero o la parola dopo il segno "=";
+;    3. salva;
+;    4. il programma rilegge le soglie da solo entro pochi secondi
+;       (per cambiare [seriale] o [registro] serve invece riavviarlo:
+;        systemctl --user restart osservatorio-meteo).
+;
+;  Le righe che iniziano con ";" sono commenti e vengono ignorate.
+;  Per i numeri con la virgola usa il PUNTO: 2.4 (non 2,4).
+;  Per i "si/no" puoi scrivere: si / no.
+; =============================================================================
+
+[generale]
+; modalita = taratura  -> registra i dati, NON comunica mai "sicuro" a Ekos e
+;                         non provoca nessuna azione. Il registro mostra cosa
+;                         avrebbe deciso il programma con le soglie attuali.
+; modalita = normale   -> valuta le condizioni e le comunica a Ekos.
+; Si parte in taratura: passa a "normale" solo dopo aver scelto le soglie
+; (vedi docs/08-taratura-meteo.md).
+modalita = taratura
+
+[seriale]
+; Nome fisso dato all'Arduino meteo dalla regola udev
+; (vedi strumenti/crea_regola_udev.sh). Scrivi "simulazione" per provare
+; il programma senza hardware: i valori si prendono dalla sezione [simulazione].
+porta = /dev/osservatorio-meteo
+velocita = 9600
+
+[soglie]
+; ---- NUVOLE -----------------------------------------------------------------
+; differenza = temperatura del cielo - temperatura dell'aria (gradi C).
+; Cielo sereno: molto negativa (es. -20 / -35). Cielo coperto: vicina a 0.
+; Se la differenza e' PIU' ALTA (meno negativa) della soglia -> "nuvoloso".
+; Il valore giusto per il tuo cielo lo trovi con la taratura.
+nuvole_soglia_differenza = -15
+; Le nuvole rendono le condizioni "non sicure"? (si/no)
+nuvole_rendono_non_sicuro = si
+
+; ---- VENTO (km/h) ---------------------------------------------------------------
+; Velocita' media sugli ultimi "vento_finestra_media_s" secondi.
+vento_medio_max_kmh = 25
+; Raffica massima (picco su 2 secondi) negli ultimi "vento_finestra_media_s" secondi.
+raffica_max_kmh = 40
+
+; ---- PIOGGIA ---------------------------------------------------------------------
+; Con la pioggia le condizioni sono SEMPRE non sicure: non e' disattivabile.
+
+[vento]
+; Quanti km/h corrispondono a 1 impulso al secondo. Lo dice la scheda tecnica
+; dell'anemometro. Per gli anemometri "Misol WH-SP-WS01" / SparkFun SEN-15901
+; e' 2.4.
+kmh_per_impulso_al_secondo = 2.4
+vento_finestra_media_s = 120
+
+[sicurezza]
+; Quando le condizioni tornano buone, aspetta questi minuti (con condizioni
+; sempre buone) prima di dichiarare di nuovo "sicuro". Evita apri/chiudi continui.
+attesa_ritorno_sicuro_min = 15
+; Se dall'Arduino meteo non arrivano dati validi per questi secondi -> NON SICURO.
+dati_vecchi_dopo_s = 30
+; Se il programma meteo stesso smette di aggiornare lo stato per questi secondi,
+; il collegamento con Ekos risponde NON SICURO (programma bloccato o spento).
+stato_vecchio_dopo_s = 90
+; Quante letture consecutive non valide del sensore a infrarossi sono tollerate
+; (una lettura ogni 2 secondi) prima di dichiarare il sensore guasto.
+letture_non_valide_tollerate = 3
+; Valori "assurdi": fuori da questi limiti la lettura e' considerata non valida.
+aria_min = -40
+aria_max = 50
+cielo_min = -80
+cielo_max = 50
+vento_max_plausibile_kmh = 200
+; Se l'anemometro segna vento ZERO per piu' di queste ore manda un avviso
+; (potrebbe essere bloccato o scollegato). 0 = mai.
+avviso_vento_zero_ore = 48
+
+[avvisi]
+; Notifiche sul desktop del PC (finestrelle in alto a destra).
+notifiche_desktop = si
+; Se un guasto persiste, ripeti l'avviso ogni tanti minuti.
+ripeti_avviso_guasto_min = 30
+
+[registro]
+; Cartella dei file CSV giornalieri (apribili con LibreOffice Calc)
+; e del file di log. "~" significa la tua cartella personale.
+cartella = ~/osservatorio-meteo
+; Ogni quanti secondi scrivere una riga nel registro CSV.
+intervallo_s = 30
+
+[simulazione]
+; Usata SOLO se in [seriale] porta = simulazione. Puoi cambiare questi
+; valori mentre il programma gira, per provare la catena fino a Ekos.
+aria = 10.0
+cielo = -25.0
+vento_kmh = 5.0
+pioggia = no
+mlx_funzionante = si
