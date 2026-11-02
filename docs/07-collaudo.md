@@ -25,7 +25,30 @@ risultato non è quello atteso, **fermati** e scrivimi cosa hai visto.
       il tetto simulato si apre e si chiude.
 - [ ] Così impari dove sono i pulsanti senza rischi.
 
-**0.2 Meteo simulato**
+**0.2 Arduino del tetto virtuale (facoltativo, richiede `sudo apt install g++`)**
+
+Lo sketch vero gira sul PC con un tetto simulato. Serve a imparare a usare
+`prova_tetto.py` prima di avere l'hardware.
+
+1. In un Terminale:
+
+   ```bash
+   bash ~/observatory/arduino/tetto/test/esegui_tetto_virtuale.sh
+   ```
+
+2. In un secondo Terminale:
+
+   ```bash
+   python3 ~/observatory/strumenti/prova_tetto.py /tmp/tetto-virtuale
+   ```
+
+3. Spunta le verifiche:
+
+- [ ] Scelta 2 (APRI): lo stato passa a "IN APERTURA" e poi ad "APERTO".
+- [ ] Nel primo Terminale scrivi `m` e premi Invio: la montatura risulta non
+      parcheggiata e il movimento è "BLOCCATO".
+
+**0.3 Meteo simulato**
 
 - [ ] In `~/.config/osservatorio/meteo.ini` metti `porta = simulazione` e
       `modalita = normale`.
@@ -58,7 +81,7 @@ alla scheda del cancello.**
 - [ ] Scollega e ricollega l'Arduino: **nessun relè deve scattare**
       all'accensione. I LED del modulo relè devono restare spenti.
 - [ ] Se invece i relè restano tutti attivi, il modulo è "attivo alto": in
-      `tetto.ino` metti `RELE_ATTIVO_BASSO` a `0` e ricarica lo sketch.
+      `configurazione_scheda.h` metti `RELE_ATTIVO_BASSO` a `0` e ricarica lo sketch.
 
 **A.3 Lettura dei sensori**
 
@@ -80,8 +103,9 @@ alla scheda del cancello.**
       Premi il fungo: "Movimento BLOCCATO: SI".
 - [ ] Premi a mano il finecorsa CHIUSO: "TETTO CHIUSO: SI". Rilascialo: "no".
 - [ ] Premi a mano il finecorsa APERTO: "TETTO APERTO: SI".
-- [ ] Premi **entrambi** insieme: "Movimento BLOCCATO: SI", e alla scelta 5
-      il motivo dice "finecorsa incoerenti".
+- [ ] Premi **entrambi** insieme: "Movimento BLOCCATO: SI" e "STATO DEL
+      TETTO: FINECORSA INCOERENTI".
+- [ ] Con nessun finecorsa premuto: "STATO DEL TETTO: FERMO A META'".
 - [ ] Togli un filo a un finecorsa: deve risultare "no", mai "SI".
 
 **A.4 I relè**
@@ -93,13 +117,13 @@ alla scheda del cancello.**
 
 - [ ] Scelta **2 (APRI)**: si sente il "clic" del relè 1 e il tester fa
       bip per circa mezzo secondo. Gli altri relè non scattano.
-- [ ] **Senza rilasciare il finecorsa CHIUSO**, aspetta 10 secondi: si
+- [ ] **Senza rilasciare il finecorsa CHIUSO**, aspetta 8 secondi: si
       deve sentire il clic del relè 3 (STOP). Alla scelta 5 compare il
-      motivo "il tetto non si e' staccato dal finecorsa". È la protezione
+      motivo "il tetto non e' partito". È la protezione
       "motore che non parte".
 - [ ] Scelta 6 (azzera errore). Ora rilascia il finecorsa CHIUSO (tetto "a
       metà"), scegli 2 (APRI) e **non toccare nulla**: dopo
-      `TEMPO_MAX_MOVIMENTO_S` secondi (80 di default) scatta lo STOP e il
+      `TEMPO_MAX_MOVIMENTO_S` secondi (45 di default) scatta lo STOP e il
       motivo è "tempo massimo di movimento superato".
 - [ ] Scelta 6. Scegli 3 (CHIUDI), poi dopo 5 secondi allontana un
       magnete della montatura: STOP immediato, motivo "montatura uscita dal
@@ -139,19 +163,53 @@ alla scheda del cancello.**
 
 ## Fase B — Collegamento alla scheda, motore SBLOCCATO ⏳
 
-> Questa fase la dettaglierò dopo aver visto la foto della scheda.
-> In sintesi:
+> Si fa **solo dopo** che:
+>
+> - i controlli di [10-controlli-senza-corrente.md](10-controlli-senza-corrente.md)
+>   e le misure E1-E3 dell'elettricista sono fatti;
+> - io ho aggiornato `configurazione_scheda.h` e `docs/03` con la strada
+>   scelta (A o B).
+>
+> Le voci qui sotto valgono per entrambe le strade.
 
-1. Con l'elettricista, a corrente staccata, si collegano i relè ai morsetti
-   giusti.
-2. Si sblocca il motore con la **chiave di sblocco manuale**: il motore gira
-   ma il tetto non si muove.
-3. Si verifica che APRI, CHIUDI e STOP dati dall'Arduino facciano davvero
-   partire e fermare il motore, nel verso giusto.
-4. Si verifica che la **richiusura automatica** della scheda sia spenta.
-5. Si verifica che il pulsante di emergenza fermi il motore.
+**B.1 Preparazione (corrente tolta, con l'elettricista)**
 
----
+- [ ] I fili dei relè sono collegati come indicato in `docs/03` (strada A o
+      B), con il cavo separato dai fili di corrente e motore.
+- [ ] Il motore è **sbloccato** con la chiave di sblocco manuale: il motore
+      può girare, ma il tetto non si muove (H21). Se non c'è un modo di
+      sbloccarlo, l'elettricista scollega temporaneamente il motore e si
+      osservano solo i LED e i relè della scheda.
+- [ ] Telescopio parcheggiato, nessuno vicino al binario.
+
+**B.2 I tre comandi (corrente ridata dall'elettricista)**
+
+Con `prova_tetto.py`, tenendo premuto a mano il finecorsa CHIUSO, come se il
+tetto fosse chiuso:
+
+- [ ] Scelta 2 (APRI): il motore gira **nel verso di apertura**. Dopo 8
+      secondi l'Arduino preme STOP, perché il tetto non si muove e il
+      finecorsa resta premuto: il motore deve fermarsi. Così si provano
+      insieme APRI, STOP e la protezione "il tetto non è partito" (H6, H9,
+      H10, H15).
+- [ ] Scelta 6, poi scelta 3 (CHIUDI) tenendo premuto il finecorsa APERTO:
+      il motore gira nel verso **opposto**, poi STOP dopo 8 secondi.
+- [ ] Se un comando ogni tanto non viene ricevuto, allunga `IMPULSO_MS` in
+      `configurazione_scheda.h` (per esempio a 1000) e riprova (H15).
+- [ ] Premi **STOP** (scelta 4) a motore fermo: il motore **non** deve
+      partire (H9).
+
+**B.3 Richiusura automatica (la più importante)**
+
+- [ ] Dai APRI e lascia che l'Arduino fermi tutto. Poi **aspetta 60
+      secondi senza fare nulla**: il motore **non deve ripartire da solo**
+      (H12, H13). Se riparte, emergenza: la richiusura automatica è attiva,
+      e la fase C **non si fa** finché non è disattivata.
+
+**B.4 Pulsante di emergenza**
+
+- [ ] Durante un comando APRI premi il fungo: il motore si ferma subito e
+      l'Arduino mostra "Movimento BLOCCATO".
 
 ## Fase C — Il tetto si muove (SOTTO SORVEGLIANZA)
 
@@ -185,8 +243,8 @@ alla scheda del cancello.**
 
 - [ ] Apri tutto e cronometra: tempo di apertura = ____ s.
 - [ ] Chiudi tutto e cronometra: tempo di chiusura = ____ s.
-- [ ] In `tetto.ino` metti `TEMPO_MAX_MOVIMENTO_S` = tempo più lungo × 1,3,
-      arrotondato. Ricarica lo sketch.
+- [ ] In `configurazione_scheda.h` metti `TEMPO_MAX_MOVIMENTO_S` = tempo più
+      lungo × 1,3, arrotondato. Ricarica lo sketch.
 - [ ] In Ekos, scheda Options del tetto, imposta "Roof Timeout" a
       `TEMPO_MAX_MOVIMENTO_S` + 10.
 
@@ -201,6 +259,15 @@ alla scheda del cancello.**
       tetto (l'Arduino è alimentato a 12 V): entro 15 s il tetto si ferma.
 - [ ] **Montatura:** durante l'apertura allontana a mano un magnete del
       sensore di parcheggio: il tetto si ferma subito.
+- [ ] **Movimento non comandato:**
+  1. Tetto aperto. Allontana un magnete del sensore di parcheggio (come se
+     si stesse osservando) e aspetta 10 secondi.
+  2. Premi **close** sul telecomando: l'Arduino deve premere STOP entro un
+     paio di secondi.
+  3. Con `prova_tetto.py`, scelta 5: "avviso: movimento non comandato…".
+- [ ] (Se hai montato il sensore di movimento) **Fermo a metà:** durante
+      l'apertura premi Stop sul **telecomando**. L'Arduino se ne accorge
+      dopo pochi secondi: "il tetto si e' fermato a meta'".
 - [ ] **Ostacolo** (protezione della scheda): metti una scatola di cartone
       vuota sul percorso. La scheda deve fermare il motore al contatto. Se
       non lo fa, regola la sensibilità seguendo il manuale.
@@ -215,6 +282,17 @@ alla scheda del cancello.**
       Annota ogni anomalia.
 
 ---
+
+**C.6 Dopo un'interruzione di corrente (ipotesi H19)**
+
+- [ ] Tetto **a metà corsa**. L'elettricista toglie e ridà la corrente alla
+      scheda del cancello (l'Arduino resta acceso con il suo alimentatore).
+- [ ] Dai **CHIUDI** da `prova_tetto.py`, con la mano sul fungo di
+      emergenza. Annota in che verso parte il tetto: ________.
+- [ ] Se parte in **apertura** invece che in chiusura, la scheda, dopo un
+      blackout, "dimentica" la posizione. Annotalo e scrivimelo. Da quel
+      momento la regola è: **dopo ogni blackout, la prima manovra si fa
+      sorvegliando**.
 
 ## Fase D — Stazione meteo e Ekos
 
@@ -238,7 +316,7 @@ alla scheda del cancello.**
 
 **Solo se decidi di attivare la chiusura automatica per il meteo da Ekos:**
 
-- [ ] Prova prima con il meteo **simulato** (fase 0.2) e il tetto vero sotto
+- [ ] Prova prima con il meteo **simulato** (fase 0.3) e il tetto vero sotto
       sorveglianza: `pioggia = si` → Ekos parcheggia la montatura e poi chiude
       il tetto.
 

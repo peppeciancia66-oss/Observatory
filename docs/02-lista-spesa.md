@@ -14,7 +14,7 @@ comprarle** prima che io abbia visto la foto dei morsetti.
 |---|---|---|---|---|---|
 | A1 | Arduino Uno R3 **originale** | Arduino A000066 | 1 | 25 € | L'originale ha un numero di serie: Linux lo riconosce sempre (vedi `strumenti/crea_regola_udev.sh`). |
 | A2 | Morsettiera a vite per Uno | cerca: "Arduino Uno screw terminal shield" | 1 | 8-12 € | Per collegare i fili con le viti, senza saldare. |
-| A3 ⏳ | Modulo 4 relè 5 V con optoisolatori | cerca: "modulo 4 relè 5V optoisolato" (es. AZDelivery, Elegoo) | 1 | 8-10 € | Va bene se gli ingressi della scheda sono "contatti puliti" a bassa tensione (è il caso più comune). Lo confermo dopo la foto. |
+| A3 ⏳ | Modulo 4 relè 5 V con optoisolatori | cerca: "modulo 4 relè 5V optoisolato" (es. AZDelivery, Elegoo). Ancora meglio, per i piccoli segnali: 3-4 relè con **contatti dorati** (es. Finder 34.51.7.005.5010 o Omron G5V-1-5VDC) su una basetta con driver | 1 | 8-10 € (modulo) | Il manuale indica ingressi a bassa tensione (uscita accessori 15 V, 30 mA): basta un contatto pulito. **Da confermare con le misure (H3)**. |
 | A4 | Finecorsa tetto aperto/chiuso | Finecorsa a leva con rotella IP65, 1NA+1NC. Economico: cerca "finecorsa ME-8108". Migliore: Omron D4N o Telemecanique XCK | 2 (+1 di scorta) | 5-30 € cad. | Si montano sul binario: la rotella viene premuta dal tetto a fine corsa. |
 | A5 | Sensore "montatura parcheggiata" | Contatto magnetico reed da allarme, tipo "MC-38" (contatto chiuso con magnete vicino) | 2 | 3-5 € | Uno per asse (AR e DEC), collegati in serie: il contatto è chiuso solo se **entrambi** gli assi sono in parcheggio. |
 | A6 | Pulsante di emergenza | A fungo, con ritenuta e sblocco a rotazione, **2 contatti NC**, in scatola IP65 (es. Schneider Harmony XALK, Eaton M22) | 1 | 25-45 € | Un contatto toglie corrente alla scheda del cancello (lo collega l'elettricista), l'altro va all'Arduino. |
@@ -24,6 +24,9 @@ comprarle** prima che io abbia visto la foto dei morsetti.
 | A10 | Cavo per i sensori | Cavo schermato da allarme 4×0,22 mm² | 20-30 m | 15 € | Per finecorsa, sensore della montatura, emergenza. |
 | A11 | Gruppo di continuità (UPS) | 600-800 VA (es. APC Back-UPS, Eaton Ellipse) | 1 | 70-120 € | Per il PC e l'alimentatore A7. |
 | A12 ⏳ | Batteria tampone per la scheda del cancello | Solo se il modello SHZICMY la prevede | 1 | - | Lo vediamo dalla foto o dal manuale. |
+| A13 | Sensore di movimento (consigliato) | 1 contatto magnetico reed tipo "MC-38" + 15-20 piccoli magneti al neodimio (es. 10×3 mm) | 1 + magneti | 8 € | Montato accanto al binario, con i magneti sul tetto ogni 30 cm circa: dice all'Arduino se il tetto si muove davvero, anche a metà corsa. |
+| A14 ⏳ | Telecomando di scorta (solo per la "strada B") | Uguale all'originale: 433 MHz, 4 tasti, chip EV1527, pila 27A 12 V | 1 | 8-12 € | Si abbina alla scheda e si collega ai relè al posto degli ingressi. Comprarlo solo se le verifiche indicano la strada B. |
+| A15 | Cavo per i comandi relè → scheda | Cavo schermato 4×0,22 mm², **separato** da quelli di corrente e motore | 5-10 m | 5 € | Il manuale della scheda chiede di separare le linee di potenza da quelle di comando. |
 
 ## B. Stazione meteo
 
@@ -56,4 +59,4 @@ comprarle** prima che io abbia visto la foto dei morsetti.
 1. **Subito:** A1, A2, A9, B1, B2, B3, C1, C3 (servono per le prove al banco
    e per la taratura del meteo).
 2. **Poi:** A4, A5, A6, A7, A8, A10, A11, B4, B5, B6-B9.
-3. **Dopo la foto della scheda:** A3 ed eventualmente A12.
+3. **Dopo i controlli della scheda** (`docs/10`): A3, ed eventualmente A12 e A14.

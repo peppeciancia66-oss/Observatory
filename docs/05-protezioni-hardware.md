@@ -40,6 +40,32 @@ con un contatto di parcheggio della montatura in serie. È però
 un'automazione che **non si può fermare dal PC**. Ne parliamo dopo aver visto
 la scheda: dipende da come gestisce un comando "chiudi" che resta premuto.
 
+## Specifico di questa scheda (ABM241) e di questo motore (MD370)
+
+Dal manuale e dalla targhetta (vedi `04-scheda-cancello.md`):
+
+- **Richiusura automatica.** Si imposta con i DIP 2 e 3 (forse anche con il
+  potenziometro: il manuale e la scheda non sono d'accordo). Deve essere
+  **spenta e verificata** (ipotesi H12, H13; controlli C8, C9, E2). Lo
+  sketch ha comunque una protezione software: se il tetto si muove da solo
+  con la montatura fuori parcheggio, preme STOP. Non sostituisce però la
+  verifica.
+- **Rilevamento ostacoli.** DIP 4 (ipotesi H11) e potenziometro "Closing
+  Obstruction" (H13): va lasciato **attivo**, tarato al collaudo C.4.
+- **Finecorsa interni del motore** (connettore "Limit", selettore
+  one/two Limit): sono la protezione numero 2 della tabella. Non vanno
+  modificati e vanno regolati **oltre** i nostri finecorsa (H14).
+- **Uscita "Lights AC220V".** È l'uscita del lampeggiante a 230 V ⚡. Non va
+  mai usata per collegarci i relè dell'Arduino (H4).
+- **Messa a terra.** Il manuale chiede la messa a terra della carcassa del
+  motore e di non invertire fase ("fire") e neutro ("zero") ⚡.
+- **Cavi separati.** Il manuale chiede di separare i cavi di potenza da
+  quelli di comando e di non collegare la linea dei finecorsa ("switch in
+  place") a quelle del motore o della corrente: si danneggerebbe la scheda.
+- **Fusibile da 10 A / 250 V** sulla scheda; corrente di spunto del motore 3 A.
+- **Dopo un blackout** la scheda potrebbe non sapere dov'è il tetto (H19):
+  la prima manovra dopo il ritorno della corrente va fatta **sorvegliando**.
+
 ## Dove serve l'elettricista ⚡ (riepilogo)
 
 1. Linea dedicata all'osservatorio con interruttore magnetotermico-differenziale.
@@ -49,8 +75,11 @@ la scheda: dipende da come gestisce un comando "chiudi" che resta premuto.
 4. Messa a terra di struttura, motore, telescopio e quadro.
 5. Eventuale lampeggiante, se a 230 V.
 6. Scaricatore di sovratensione.
-7. Presenza durante le misure sulla scheda accesa (`04-scheda-cancello.md`).
-8. Dichiarazione di conformità dell'impianto. Dopo una modifica
+7. Presenza durante le misure sulla scheda accesa e controlli E1-E3
+   (`10-controlli-senza-corrente.md`): tensioni degli ingressi e del
+   morsetto verde, prova della richiusura automatica, terra.
+8. Togliere la corrente in sicurezza prima dei controlli (C1).
+9. Dichiarazione di conformità dell'impianto. Dopo una modifica
    all'impianto elettrico è un obbligo di legge (D.M. 37/2008).
 
 Tutti gli altri collegamenti sono a 5-12 V e puoi farli tu, sempre a corrente

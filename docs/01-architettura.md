@@ -67,7 +67,9 @@ secondo computer da mantenere.
 
 | Decisione | Chi la prende | Dove si configura |
 |---|---|---|
-| Fermare il motore (tempo massimo, sensori, PC muto, emergenza) | **Arduino del tetto**, da solo | `arduino/tetto/tetto.ino`, sezione CONFIGURAZIONE |
+| Fermare il motore (tempo massimo, sensori, PC muto, emergenza) | **Arduino del tetto**, da solo | Tempi: `arduino/tetto/configurazione_scheda.h`; il resto: `tetto.ino`, sezione CONFIGURAZIONE |
+| Fermare un movimento **non comandato** (telecomando, richiusura automatica della scheda) se la montatura non è parcheggiata | **Arduino del tetto**, da solo | Sempre attivo; con il sensore di movimento anche a metà corsa |
+| Valori che dipendono dalla scheda del cancello (durata impulsi, tempi, sensore di movimento) | — | `arduino/tetto/configurazione_scheda.h` (unico file da aggiornare quando arriveranno i dati) |
 | Rifiutare il movimento se la montatura non è parcheggiata | **Arduino del tetto** (sensore fisico) **e** Ekos ("Mount Policy") | Sensore sulla montatura + opzioni del driver |
 | Dire se il meteo è sicuro | Programma meteo sul PC | `~/.config/osservatorio/meteo.ini` |
 | Chiudere il tetto quando il meteo diventa non sicuro | **Ekos** (modulo Observatory), **disattivato di default** | Ekos → Observatory → Weather |
@@ -127,3 +129,28 @@ quando non si osserva.
    ogni rifiuto viene comunicato **prima**, con la luce "Roof Lock" (stato
    `LOCKED`). Il driver, vedendola, non invia nemmeno il comando e scrive
    nel registro "Roof is externally locked".
+
+## Lo stato del tetto: i nostri sensori, non quelli del motore
+
+Lo stato del tetto viene letto **solo dai nostri sensori**, non dai
+finecorsa interni del motore, che restano alla scheda del cancello per
+fermare il motore:
+
+- finecorsa **APERTO** e **CHIUSO**;
+- **sensore di movimento** (facoltativo): un contatto reed e dei magneti sul
+  tetto.
+
+Da questi l'Arduino ricava sei stati:
+
+- aperto;
+- chiuso;
+- in apertura;
+- in chiusura;
+- fermo a metà;
+- movimento non comandato.
+
+Senza sensore di movimento, "in apertura" e "in chiusura" valgono solo per i
+movimenti comandati dall'Arduino. Un movimento non comandato si nota solo
+nel momento in cui il tetto lascia un finecorsa (ipotesi H23 in
+`09-ipotesi-da-verificare.md`). Per questo il sensore di movimento è
+consigliato.

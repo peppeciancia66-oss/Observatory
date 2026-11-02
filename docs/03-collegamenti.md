@@ -50,6 +50,7 @@ dalla parte **sicura**:
                     │ A2 ──── reed AR ─ reed DEC ──┤ (in serie)│
                     │ A3 ──── relè pioggia (contatto 2) ───────┤
                     │ A4 ──── emergenza (contatto NC) ─────────┤
+                    │ D2 ──── reed movimento (facoltativo) ────┤
                     │ GND ─────────────────────────┘ ritorno comune
                     └──────────────────────────────────────────┘
 ```
@@ -77,28 +78,66 @@ dalla parte **sicura**:
    A4 e GND.
 6. **Pioggia.** Il secondo contatto del relè di appoggio della pioggia
    (vedi 3.4) va tra A3 e GND.
-7. **Alimentazione.** L'alimentatore 12 V va nella presa tonda
+7. **Sensore di movimento (facoltativo, consigliato).** Un contatto
+   magnetico reed fisso, accanto al binario, tra D2 e GND, e dei piccoli
+   magneti fissati sul tetto ogni 30 cm circa. Ogni magnete che passa
+   chiude il contatto per un attimo: così l'Arduino sa se il tetto si muove
+   davvero, anche a metà corsa. Si attiva con `USA_SENSORE_MOVIMENTO 1` in
+   `configurazione_scheda.h`. Se la distanza tra i magneti cambia, va
+   ricalcolato `FINESTRA_MOVIMENTO_MS`.
+8. **Alimentazione.** L'alimentatore 12 V va nella presa tonda
    dell'Arduino, la USB al PC. Con entrambi collegati, l'Arduino usa
    automaticamente i 12 V e resta acceso anche se il PC si spegne.
 
-### Relè → scheda del cancello ⏳
+### Relè → scheda del cancello ⏳ (PROVVISORIO: NON COLLEGARE ANCORA)
 
-Ogni relè ha tre morsetti: **COM** (comune), **NO** (normalmente aperto) e
-**NC** (normalmente chiuso). Per imitare un pulsante di solito si usano COM
-e NO: quando il relè scatta, COM e NO si collegano per mezzo secondo, come
-un dito che preme il tasto.
+> Questa sezione verrà completata quando avremo i dati dei controlli
+> ([10-controlli-senza-corrente.md](10-controlli-senza-corrente.md)). Le
+> ipotesi su cui si basa sono in
+> [09-ipotesi-da-verificare.md](09-ipotesi-da-verificare.md).
+
+**Il principio.** Ogni relè ha tre morsetti:
+
+- **COM** (comune);
+- **NO** (normalmente aperto);
+- **NC** (normalmente chiuso).
+
+Per imitare un pulsante si usano COM e NO: quando il relè scatta, COM e NO
+si collegano per mezzo secondo, come un dito che preme il tasto. **Dalla
+parte della scheda arrivano solo i fili dei contatti dei relè.** L'Arduino
+non è mai collegato ai morsetti della scheda.
+
+Tra la scatola dei relè e la scheda usa un **cavo separato** da quelli della
+corrente e del motore. Lo chiede anche il manuale della scheda: "separate the
+power line from the control line".
+
+**Strada A — ingressi della scheda** (solo se il morsetto verde risulta
+"open / stop / close" a bassa tensione: ipotesi H4, H5, H8):
 
 ```
-   RELÈ 1 (APRI)    COM ───────── morsetto ⏳ della scheda
-                    NO  ───────── morsetto ⏳ della scheda
-   RELÈ 2 (CHIUDI)  COM / NO ──── morsetti ⏳
-   RELÈ 3 (STOP)    COM / NO (oppure NC) ──── morsetti ⏳
+   RELÈ 1 (APRI)    COM ── comune ⏳ (ipotesi: morsetto 2 "GND")      NO ── ingresso "open" ⏳
+   RELÈ 2 (CHIUDI)  COM ── comune ⏳                                  NO ── ingresso "close" ⏳
+   RELÈ 3 (STOP)    COM ── comune ⏳                                  NO (o NC, H8) ── ingresso "stop" ⏳
 ```
 
-**Non collegare niente alla scheda del cancello finché non abbiamo visto
-insieme la foto dei morsetti.** Molte schede hanno lo STOP "normalmente
-chiuso": in quel caso si usa il contatto NC del relè. Lo capiremo dalla
-foto e dalle misure (vedi `04-scheda-cancello.md`).
+**Strada B — telecomando di scorta in parallelo ai tasti** (se il morsetto
+verde è il lampeggiante a 230 V):
+
+```
+   RELÈ 1 (APRI)    COM / NO ── ai due capi del tasto "Open"  (▲) del telecomando di scorta
+   RELÈ 2 (CHIUDI)  COM / NO ── ai due capi del tasto "close" (▼)
+   RELÈ 3 (STOP)    COM / NO ── ai due capi del tasto "Stop"  (■)
+```
+
+(Come aprire il telecomando e dove saldare i fili lo spiegherò se si
+sceglie questa strada.)
+
+**In nessun caso:**
+
+- si collega qualcosa al morsetto verde prima delle misure dell'elettricista
+  (potrebbe essere a 230 V);
+- si usa l'ingresso "cycle"/"test" (passo-passo);
+- si collega l'Arduino direttamente alla scheda.
 
 ## 3.3 Arduino della stazione meteo (Nano)
 

@@ -17,11 +17,12 @@ roll-off** e la **stazione meteo fai-da-te** dell'osservatorio da
 
 | Parte | Stato |
 |---|---|
-| Sketch Arduino del tetto, con tutte le sicurezze | ✅ Pronto e provato con un simulatore (61 verifiche automatiche) |
-| Sketch Arduino della stazione meteo | ✅ Pronto (compila per Arduino Nano) |
+| Sketch Arduino del tetto, con tutte le sicurezze | ✅ Pronto e provato con un simulatore (220 verifiche automatiche su 3 varianti). **Mai provato su hardware vero.** |
+| Sketch Arduino della stazione meteo | ✅ Pronto (compila per Arduino Nano). **Mai provato su hardware vero.** |
 | Programma meteo + collegamento a Ekos | ✅ Pronto e provato (48 test automatici) |
-| Installazione, collaudo, taratura | ✅ Documentati |
-| **Collegamento tra relè e scheda del cancello** | ⏳ **In attesa della foto della scheda** (vedi [docs/04](docs/04-scheda-cancello.md)) |
+| Regole udev, installazione, collaudo, taratura | ✅ Documentati |
+| Lettura delle foto della scheda ABM241 | ✅ Fatta, con dubbi elencati ([docs/04](docs/04-scheda-cancello.md)) |
+| **Collegamento tra relè e scheda del cancello** | ⏳ **In attesa dei controlli** ([docs/10](docs/10-controlli-senza-corrente.md)). Tutto ciò che dipende dalla scheda è in `arduino/tetto/configurazione_scheda.h`; le ipotesi sono in [docs/09](docs/09-ipotesi-da-verificare.md) |
 
 ## Documenti (leggili in quest'ordine)
 
@@ -33,12 +34,15 @@ roll-off** e la **stazione meteo fai-da-te** dell'osservatorio da
 6. [Montaggio della stazione meteo e protezione dalle intemperie](docs/06-montaggio-stazione-meteo.md)
 7. [Procedura di collaudo in sicurezza](docs/07-collaudo.md)
 8. [Taratura della stazione meteo](docs/08-taratura-meteo.md)
+9. [Ipotesi da verificare](docs/09-ipotesi-da-verificare.md) ⏳
+10. [Controlli da fare con la corrente tolta](docs/10-controlli-senza-corrente.md) ⏳
 
 ## Contenuto del repository
 
 ```
 arduino/tetto/tetto.ino          programma dell'Arduino Uno (tetto)
-arduino/tetto/test/              prove automatiche del programma del tetto (simulatore)
+arduino/tetto/configurazione_scheda.h  TUTTO cio' che dipende dalla scheda del cancello
+arduino/tetto/test/              prove automatiche e "Arduino virtuale" del tetto (simulatore)
 arduino/meteo/meteo.ino          programma dell'Arduino Nano (stazione meteo)
 meteo/meteo_servizio.py          programma meteo (gira sempre, in sottofondo)
 meteo/weather_status.py          script chiamato da Ekos (Weather Safety Proxy)
@@ -50,6 +54,7 @@ strumenti/crea_regola_udev.sh    dà un nome fisso a ciascun Arduino
 strumenti/prova_tetto.py         prova del tetto senza Ekos (collaudo)
 strumenti/riepilogo_taratura.py  riassunto dei dati registrati
 systemd/                         servizio che avvia il programma meteo da solo
+udev/                            esempio delle regole udev (le crea lo script)
 docs/                            tutta la documentazione
 ```
 
@@ -144,7 +149,8 @@ confondi.
 
 1. Collega l'Arduino Uno al PC con il cavo USB.
 2. Apri l'IDE di Arduino → **File → Apri** →
-   `observatory/arduino/tetto/tetto.ino`.
+   `observatory/arduino/tetto/tetto.ino`. Si apre anche una seconda
+   scheda, `configurazione_scheda.h`: è normale, fa parte dello sketch.
 3. In alto, nel menu a tendina della scheda, scegli **Arduino Uno** e la
    porta (di solito `/dev/ttyACM0`).
 4. Premi il pulsante con la **freccia verso destra** (Carica). In basso deve
@@ -211,7 +217,7 @@ systemctl --user restart osservatorio-meteo
    - **Mount Policy** = **Mount locks** (il tetto non si chiude se la
      montatura non è parcheggiata);
    - **Roof Movement → Timeout in Seconds** = tempo massimo dell'Arduino
-     + 10 (inizialmente **90**; lo aggiornerai al collaudo, fase C.3);
+     + 10 (inizialmente **55**; lo aggiornerai al collaudo, fase C.3);
    - in fondo premi **Configuration → Save**.
 
 **8.3 Il meteo (driver Weather Safety Proxy)**
@@ -237,10 +243,30 @@ parcheggiare la montatura e chiudere il tetto).
 e taratura (docs/07 fase D, docs/08). Quando le attiverai, l'ordine giusto è:
 prima **parcheggiare la montatura**, poi **chiudere il tetto**.
 
-## Passo 9 — Collaudo
+## Passo 9 — Collaudo in sicurezza
 
-Segui [docs/07-collaudo.md](docs/07-collaudo.md) dall'inizio. **Non saltare
-nessuna fase.**
+La procedura completa, con le caselle da spuntare, è in
+[docs/07-collaudo.md](docs/07-collaudo.md). Va fatta dall'inizio, **senza
+saltare nessuna fase**. In sintesi:
+
+| Fase | Cosa si fa | Il motore | Chi |
+|---|---|---|---|
+| 0 | Prove al PC: tetto simulato in Ekos, "Arduino virtuale", meteo simulato | — | tu |
+| A | Arduino, relè e sensori **sul tavolo**: si sentono i "clic" dei relè, si provano tutte le protezioni (tempo massimo, PC muto, montatura, emergenza, finecorsa incoerenti) | **SCOLLEGATO** dalla scheda: nessun filo va alla scheda | tu |
+| B | Relè collegati alla scheda; prova dei tre comandi e verifica che la **richiusura automatica sia spenta** | **SBLOCCATO** (gira a vuoto, il tetto non si muove) | con l'elettricista ⚡ |
+| C | Il tetto si muove: prima pochi secondi, poi corse complete, prove di arresto, 10 cicli da Ekos | in movimento, **due persone**, una con la mano sul fungo di emergenza | tu + aiutante |
+| D | Stazione meteo e Ekos; taratura di 2-3 settimane | — | tu |
+| E | (facoltativa) chiusura autonoma per pioggia | sorvegliato | tu + aiutante |
+
+**Regole che valgono sempre:**
+
+- La fase B **non si inizia** finché i controlli di
+  [docs/10](docs/10-controlli-senza-corrente.md) e le misure
+  dell'elettricista non sono fatti, e finché io non ho aggiornato
+  `configurazione_scheda.h` e lo schema dei collegamenti.
+- Tutto ciò che riguarda i **230 V** lo fa l'elettricista.
+- La chiusura automatica in base al meteo resta **disattivata** finché non
+  hai finito collaudo e taratura.
 
 ---
 
@@ -280,9 +306,10 @@ bash ~/observatory/strumenti/installa.sh
 ```
 
 Se è cambiato uno sketch (`.ino`), ricaricalo sull'Arduino (passo 6).
-**Attenzione:** caricando di nuovo `tetto.ino` si perdono le modifiche fatte
-nella sezione CONFIGURAZIONE (per esempio `TEMPO_MAX_MOVIMENTO_S`). Annotale
-prima.
+**Attenzione:** se hai modificato `arduino/tetto/configurazione_scheda.h`
+(per esempio `TEMPO_MAX_MOVIMENTO_S`) o la sezione CONFIGURAZIONE di `tetto.ino`,
+annota i tuoi valori **prima** di aggiornare. Se `git pull` si rifiuta di
+procedere a causa delle tue modifiche, scrivimi.
 
 # Per chi vuole verificare il codice
 

@@ -1,0 +1,33 @@
+# =============================================================================
+#  Regole udev dell'osservatorio: nomi fissi per i due Arduino
+# =============================================================================
+#
+#  NON serve copiarlo a mano: lo script strumenti/crea_regola_udev.sh crea
+#  queste regole da solo, con i valori giusti per i TUOI Arduino, nei file
+#  /etc/udev/rules.d/99-osservatorio-tetto.rules e
+#  /etc/udev/rules.d/99-osservatorio-meteo.rules.
+#
+#  Questo file mostra come sono fatte, nel caso servisse scriverle a mano.
+#  I valori tra <...> si leggono con:
+#      udevadm info --query=property --name=/dev/ttyACM0
+#  (ID_VENDOR_ID, ID_MODEL_ID, ID_SERIAL_SHORT, ID_PATH)
+#
+#  Dopo una modifica:
+#      sudo udevadm control --reload-rules
+#      sudo udevadm trigger --subsystem-match=tty
+# =============================================================================
+
+# --- Arduino Uno ORIGINALE del tetto: riconosciuto dal numero di serie ---------
+# (funziona in qualunque presa USB). Un Uno originale ha di solito
+# ID_VENDOR_ID=2341 e ID_MODEL_ID=0043.
+SUBSYSTEM=="tty", ENV{ID_VENDOR_ID}=="2341", ENV{ID_MODEL_ID}=="0043", ENV{ID_SERIAL_SHORT}=="<numero-di-serie-del-tuo-Uno>", SYMLINK+="osservatorio-tetto", MODE="0660", GROUP="dialout"
+
+# --- Arduino Nano COMPATIBILE (chip CH340) della stazione meteo ---------------
+# Il CH340 (ID_VENDOR_ID=1a86, ID_MODEL_ID=7523) di solito NON ha numero di
+# serie: si riconosce dalla presa USB in cui e' collegato (ID_PATH).
+# Il nome funziona solo se il cavo resta sempre nella stessa presa!
+SUBSYSTEM=="tty", ENV{ID_PATH}=="<percorso-della-presa, es. pci-0000:00:14.0-usb-0:2:1.0>", SYMLINK+="osservatorio-meteo", MODE="0660", GROUP="dialout"
+
+# --- Arduino Nano ORIGINALE della stazione meteo (alternativa alla regola sopra)
+# Il Nano originale (chip FTDI, ID_VENDOR_ID=0403, ID_MODEL_ID=6001) ha un numero di serie.
+# SUBSYSTEM=="tty", ENV{ID_VENDOR_ID}=="0403", ENV{ID_MODEL_ID}=="6001", ENV{ID_SERIAL_SHORT}=="<numero-di-serie>", SYMLINK+="osservatorio-meteo", MODE="0660", GROUP="dialout"

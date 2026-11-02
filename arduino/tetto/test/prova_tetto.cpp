@@ -22,63 +22,7 @@ namespace finto {
 
 #include TETTO_INO     // lo sketch vero (percorso passato dal compilatore)
 
-// ---------------------------------------------------------------- simulatore
-struct Simulatore {
-  double posizione = 0;          // 0 = tutto chiuso, 100 = tutto aperto
-  int direzione = 0;             // +1 apre, -1 chiude, 0 fermo
-  double velocita = 100.0 / 60;  // corsa completa in 60 s
-  bool motore_guasto = false;    // la scheda non fa muovere il motore
-  bool invertito = false;        // apri e chiudi scambiati sulla scheda
-  bool montatura_parcheggiata = true;
-  bool pioggia = false;
-  bool emergenza = false;
-  int forza_fc_aperto = -1;      // -1 normale, 0/1 forzato (finecorsa guasto)
-  int forza_fc_chiuso = -1;
-  std::vector<std::string> impulsi;
-  int rele_attivi = 0, max_rele_attivi = 0;
-} sim;
-
-static void aggiorna_ingressi() {
-  bool aperto = sim.posizione >= 99.0;
-  bool chiuso = sim.posizione <= 1.0;
-  if (sim.forza_fc_aperto >= 0) aperto = sim.forza_fc_aperto;
-  if (sim.forza_fc_chiuso >= 0) chiuso = sim.forza_fc_chiuso;
-  // contatto chiuso = pin a GND = LOW
-  finto::livello[PIN_FC_APERTO] = aperto ? LOW : HIGH;
-  finto::livello[PIN_FC_CHIUSO] = chiuso ? LOW : HIGH;
-  finto::livello[PIN_MONTATURA_PARCHEGGIATA] = sim.montatura_parcheggiata ? LOW : HIGH;
-  finto::livello[PIN_PIOGGIA] = sim.pioggia ? HIGH : LOW;      // chiuso = asciutto
-  finto::livello[PIN_EMERGENZA] = sim.emergenza ? HIGH : LOW;  // NC chiuso = ok
-}
-
-static void avanza(unsigned long ms) {
-  for (unsigned long i = 0; i < ms; i++) {
-    finto::ora_ms++;
-    sim.posizione += sim.direzione * sim.velocita / 1000.0;
-    if (sim.posizione >= 100) { sim.posizione = 100; sim.direzione = 0; }  // finecorsa della scheda
-    if (sim.posizione <= 0)   { sim.posizione = 0;   sim.direzione = 0; }
-    aggiorna_ingressi();
-  }
-}
-
-void finto::durante_attesa(unsigned long ms) { avanza(ms); }
-
-void finto::quando_scritto(uint8_t pin, int valore) {
-  if (pin != PIN_RELE_APRI && pin != PIN_RELE_CHIUDI && pin != PIN_RELE_STOP && pin != PIN_RELE_RISERVA) return;
-  int attivi = 0;
-  for (int p : {PIN_RELE_APRI, PIN_RELE_CHIUDI, PIN_RELE_STOP, PIN_RELE_RISERVA})
-    if (finto::uscita[p] == RELE_ON) attivi++;
-  if (attivi > sim.max_rele_attivi) sim.max_rele_attivi = attivi;
-  if (valore != RELE_ON) return;
-  const char* nome = pin == PIN_RELE_APRI ? "APRI" : pin == PIN_RELE_CHIUDI ? "CHIUDI" :
-                     pin == PIN_RELE_STOP ? "STOP" : "RISERVA";
-  sim.impulsi.push_back(nome);
-  if (pin == PIN_RELE_STOP) sim.direzione = 0;
-  else if (!sim.motore_guasto && !sim.emergenza) {
-    int d = (pin == PIN_RELE_APRI) ? 1 : -1;
-    sim.direzione = sim.invertito ? -d : d;
-  }
-}
+#include "simulatore_tetto.h"
 
 // ---------------------------------------------------------------- finto driver
 static void esegui(unsigned long ms) {
@@ -145,7 +89,7 @@ int main() {
   ricomincia(0);
   VERIFICA(invia("(SET:OPEN:ON)") == "(ACK:OPEN:ON)");
   VERIFICA(contiene(sim.impulsi, "APRI"));
-  interroga_per(70000);
+  interroga_per(TEMPO_MAX_MOVIMENTO_S * 1000UL);
   VERIFICA(sim.posizione >= 99);
   VERIFICA(invia("(GET:OPENED:0)") == "(ACK:OPENED:ON)");
   VERIFICA(invia("(GET:LOCKED:0)") == "(ACK:LOCKED:OFF)");
@@ -155,7 +99,7 @@ int main() {
   printf("- chiusura completa\n");
   sim.impulsi.clear();
   VERIFICA(invia("(SET:CLOSE:ON)") == "(ACK:CLOSE:ON)");
-  interroga_per(70000);
+  interroga_per(TEMPO_MAX_MOVIMENTO_S * 1000UL);
   VERIFICA(sim.posizione <= 1);
   VERIFICA(invia("(GET:CLOSED:0)") == "(ACK:CLOSED:ON)");
 
@@ -189,14 +133,22 @@ int main() {
 
   printf("- tempo massimo superato\n");
   ricomincia(0);
-  sim.velocita = 100.0 / 200;                       // tetto lentissimo (es. attrito)
+  sim.velocita = 100.0 / (TEMPO_MAX_MOVIMENTO_S * 3.0);   // tetto lentissimo (es. attrito)
   invia("(SET:OPEN:ON)");
+#if USA_SENSORE_MOVIMENTO
+  // Con il sensore di movimento un tetto cosi' lento (un magnete ogni
+  // ~13 s) viene fermato prima, come "fermo a meta'": e' il comportamento voluto.
+  interroga_per((TEMPO_MAX_MOVIMENTO_S + 2) * 1000UL);
+  VERIFICA(sim.direzione == 0 && sim.impulsi.back() == "STOP");
+  VERIFICA(invia("(INF:ERRORE:0)").find("fermato a meta'") != std::string::npos);
+#else
   interroga_per((TEMPO_MAX_MOVIMENTO_S - 2) * 1000UL);
   VERIFICA(sim.direzione == 1);
   interroga_per(4000);
   VERIFICA(sim.direzione == 0 && sim.impulsi.back() == "STOP");
   VERIFICA(invia("(GET:LOCKED:0)") == "(ACK:LOCKED:ON)");
-  VERIFICA(invia("(INF:0:0)").find("tempo massimo") != std::string::npos);
+  VERIFICA(invia("(INF:ERRORE:0)").find("tempo massimo") != std::string::npos);
+#endif
 
   printf("- motore che non parte\n");
   ricomincia(0);
@@ -205,15 +157,15 @@ int main() {
   interroga_per((TEMPO_MAX_DISTACCO_S + 2) * 1000UL);
   VERIFICA(sim.impulsi.back() == "STOP");
   VERIFICA(invia("(GET:LOCKED:0)") == "(ACK:LOCKED:ON)");
-  VERIFICA(invia("(INF:0:0)").find("staccato") != std::string::npos);
+  VERIFICA(invia("(INF:ERRORE:0)").find("partito") != std::string::npos);
 
   printf("- direzione invertita (partenza da tetto a meta')\n");
   ricomincia(50);
   sim.invertito = true;
   invia("(SET:OPEN:ON)");
-  interroga_per(40000);
+  interroga_per(TEMPO_MAX_MOVIMENTO_S * 1000UL);
   VERIFICA(sim.impulsi.back() == "STOP");
-  VERIFICA(invia("(INF:0:0)").find("direzione") != std::string::npos);
+  VERIFICA(invia("(INF:ERRORE:0)").find("direzione") != std::string::npos);
 
   printf("- PC che smette di rispondere durante il movimento\n");
   ricomincia(0);
@@ -225,7 +177,7 @@ int main() {
   VERIFICA(sim.direzione == 0 && sim.impulsi.back() == "STOP");
   VERIFICA(sim.posizione < 99);
   invia("(CON:0:0)");
-  VERIFICA(invia("(INF:0:0)").find("nessun errore") != std::string::npos);
+  VERIFICA(invia("(INF:ERRORE:0)").find("nessun errore") != std::string::npos);
 
   printf("- finecorsa incoerenti\n");
   ricomincia(0);
@@ -242,7 +194,7 @@ int main() {
   sim.forza_fc_aperto = 1; sim.forza_fc_chiuso = 1;
   interroga_per(1000);
   VERIFICA(sim.impulsi.back() == "STOP");
-  VERIFICA(invia("(INF:0:0)").find("incoerenti") != std::string::npos);
+  VERIFICA(invia("(INF:ERRORE:0)").find("incoerenti") != std::string::npos);
 
   printf("- arresto di emergenza\n");
   ricomincia(0);
@@ -266,7 +218,7 @@ int main() {
   VERIFICA(sim.direzione == 0 && sim.impulsi.back() == "STOP");
   VERIFICA(invia("(GET:LOCKED:0)") == "(ACK:LOCKED:OFF)");
   VERIFICA(invia("(SET:CLOSE:ON)") == "(ACK:CLOSE:ON)");
-  interroga_per(30000);
+  interroga_per(TEMPO_MAX_MOVIMENTO_S * 1000UL);
   VERIFICA(sim.posizione <= 1);
 
   printf("- pioggia letta dal tetto (luce Auxiliary) e chiusura autonoma disattivata\n");
@@ -292,6 +244,83 @@ int main() {
   VERIFICA(sim.posizione >= 99 && sim.impulsi.empty());
 #else
   VERIFICA(sim.impulsi.empty() && sim.posizione >= 99);
+#endif
+
+  printf("- stato in parole (in apertura / aperto / fermo a meta')\n");
+  ricomincia(0);
+  VERIFICA(invia("(INF:STATO:0)") == "(ACK:STATO:chiuso)");
+  invia("(SET:OPEN:ON)");
+  interroga_per(3000);
+  VERIFICA(invia("(INF:STATO:0)") == "(ACK:STATO:in apertura)");
+  invia("(SET:ABORT:ON)");
+  interroga_per(1000);
+  VERIFICA(invia("(INF:STATO:0)") == "(ACK:STATO:fermo a meta')");
+  invia("(SET:OPEN:ON)");
+  interroga_per(TEMPO_MAX_MOVIMENTO_S * 1000UL);
+  VERIFICA(invia("(INF:STATO:0)") == "(ACK:STATO:aperto)");
+
+  printf("- movimento NON comandato con montatura fuori parcheggio -> STOP (solo avviso)\n");
+  ricomincia(100);
+  sim.montatura_parcheggiata = false;          // si sta osservando
+  esegui(TOLLERANZA_DOPO_MOVIMENTO_MS + 500);
+  sim.direzione = -1;                          // es. richiusura automatica della scheda
+  interroga_per(3000);
+  VERIFICA(sim.direzione == 0 && contiene(sim.impulsi, "STOP"));
+  VERIFICA(sim.posizione > 90);
+  VERIFICA(invia("(INF:ERRORE:0)").find("non comandato") != std::string::npos);
+  sim.montatura_parcheggiata = true;           // fine sessione: parcheggio
+  esegui(200);
+  VERIFICA(invia("(GET:LOCKED:0)") == "(ACK:LOCKED:OFF)");   // NON bloccato
+  VERIFICA(invia("(SET:CLOSE:ON)") == "(ACK:CLOSE:ON)");
+  interroga_per(TEMPO_MAX_MOVIMENTO_S * 1000UL);
+  VERIFICA(sim.posizione <= 1);
+
+  printf("- movimento non comandato con montatura parcheggiata (telecomando): nessun intervento\n");
+  ricomincia(0);
+  esegui(TOLLERANZA_DOPO_MOVIMENTO_MS + 500);
+  sim.direzione = 1;
+  interroga_per(2000);
+  // Senza sensore di movimento lo si sa solo per pochi secondi dopo che il
+  // tetto ha lasciato il finecorsa; con il sensore, per tutto il movimento.
+  VERIFICA(invia("(INF:STATO:0)") == "(ACK:STATO:movimento non comandato)");
+  interroga_per(3000);
+  VERIFICA(sim.direzione == 1 && sim.impulsi.empty());
+
+  printf("- vibrazione breve del finecorsa (< antirimbalzo) ignorata\n");
+  ricomincia(100);
+  sim.montatura_parcheggiata = false;
+  esegui(TOLLERANZA_DOPO_MOVIMENTO_MS + 500);
+  sim.forza_fc_aperto = 0; esegui(20); sim.forza_fc_aperto = -1;
+  interroga_per(2000);
+  VERIFICA(sim.impulsi.empty());
+
+#if USA_SENSORE_MOVIMENTO
+  printf("- (sensore di movimento) tetto che si ferma a meta' durante il movimento\n");
+  ricomincia(0);
+  invia("(SET:OPEN:ON)");
+  interroga_per(10000);
+  VERIFICA(sim.direzione == 1);
+  sim.direzione = 0;                            // es. ostacolo: la scheda ferma il motore
+  sim.motore_guasto = true;
+  interroga_per(FINESTRA_MOVIMENTO_MS + 2000);
+  VERIFICA(invia("(INF:ERRORE:0)").find("fermato a meta'") != std::string::npos);
+  VERIFICA(invia("(GET:LOCKED:0)") == "(ACK:LOCKED:ON)");
+
+  printf("- (sensore di movimento) partenza da meta' con motore che non parte\n");
+  ricomincia(50);
+  sim.motore_guasto = true;
+  invia("(SET:CLOSE:ON)");
+  interroga_per((TEMPO_MAX_DISTACCO_S + 2) * 1000UL);
+  VERIFICA(sim.impulsi.back() == "STOP");
+  VERIFICA(invia("(INF:ERRORE:0)").find("partito") != std::string::npos);
+
+  printf("- (sensore di movimento) movimento non comandato rilevato anche a meta' corsa\n");
+  ricomincia(50);
+  sim.montatura_parcheggiata = false;
+  esegui(TOLLERANZA_DOPO_MOVIMENTO_MS + 500);
+  sim.direzione = 1;
+  interroga_per(6000);
+  VERIFICA(sim.direzione == 0 && contiene(sim.impulsi, "STOP"));
 #endif
 
   printf("- comando troppo lungo o spezzato non blocca nulla\n");

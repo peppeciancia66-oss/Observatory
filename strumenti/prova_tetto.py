@@ -56,10 +56,18 @@ class Tetto:
         for chiave in NOMI:
             r = self.invia(f"(GET:{chiave}:0)")
             valori[chiave] = "ON" if r.endswith(":ON)") else ("OFF" if r.endswith(":OFF)") else r)
+        valori["STATO"] = self.testo("STATO")
         return valori
+
+    def testo(self, cosa):
+        """Legge una risposta in parole: (ACK:STATO:in apertura) -> 'in apertura'."""
+        r = self.invia(f"(INF:{cosa}:0)")
+        prefisso = f"(ACK:{cosa}:"
+        return r[len(prefisso):-1] if r.startswith(prefisso) and r.endswith(")") else r
 
 
 def stampa_stato(valori):
+    print(f"   {'STATO DEL TETTO':<30} {valori.get('STATO', '?').upper()}")
     for chiave, nome in NOMI.items():
         v = valori[chiave]
         testo = {"ON": "SI", "OFF": "no"}.get(v, f"?? {v}")
@@ -91,7 +99,7 @@ def main():
                 print(f"\n[{time.strftime('%H:%M:%S')}] Cambio di stato:")
                 stampa_stato(valori)
                 if valori.get("LOCKED") == "ON":
-                    print("   Motivo del blocco:", tetto.invia("(INF:0:0)"))
+                    print("   Motivo del blocco:", tetto.testo("ERRORE"))
                 print("Scelta: ", end="", flush=True)
                 ultimo = valori
             time.sleep(1)
@@ -100,7 +108,7 @@ def main():
 
     menu = """
   1 = mostra lo stato        4 = STOP
-  2 = APRI                   5 = perche' e' bloccato?
+  2 = APRI                   5 = ultimo errore/avviso
   3 = CHIUDI                 6 = azzera errore (come riconnettere Ekos)
   0 = esci
 """
@@ -117,7 +125,7 @@ def main():
             elif scelta == "4":
                 print("Risposta:", tetto.invia("(SET:ABORT:ON)"))
             elif scelta == "5":
-                print("Risposta:", tetto.invia("(INF:0:0)"))
+                print("Errore/avviso:", tetto.testo("ERRORE"))
             elif scelta == "6":
                 print("Risposta:", tetto.invia("(CON:0:0)"))
             elif scelta == "0":

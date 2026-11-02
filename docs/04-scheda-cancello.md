@@ -1,106 +1,165 @@
-# 4. La scheda del cancello: come verificarla e quali relè usare
+# 4. La scheda del cancello (ABM241): cosa sappiamo e cosa no
 
-> ⏳ **Questa parte resta in sospeso finché non vedo la foto della scheda.**
-> Qui sotto c'è come prepararti. **Non collegare ancora niente** alla scheda.
+> ⚠️ **Niente di questa pagina è ancora verificato sulla scheda vera.** Le
+> letture vengono dalle foto del 2 novembre 2026. Non collegare nulla
+> alla scheda finché non sono fatti i controlli di
+> [10-controlli-senza-corrente.md](10-controlli-senza-corrente.md) e
+> verificate le ipotesi di [09-ipotesi-da-verificare.md](09-ipotesi-da-verificare.md).
 
-> ⚠️ La scheda del cancello è alimentata a **230 V**: sulla stessa scheda
-> ci sono morsetti a bassa tensione (i comandi) e morsetti a 230 V
-> (alimentazione, motore, a volte il lampeggiante). Fai le misure "a scheda
-> accesa" **solo con un elettricista presente**. Se non te la senti, chiedi
-> a lui di fare le misure del punto 3 e di scriverti i valori.
+## 4.1 Le foto ricevute
 
-## 4.1 Cosa mi serve (da raccogliere con calma)
+Delle sette foto annunciate ne ho ricevute **cinque**:
 
-1. **Foto della scheda intera**, dall'alto, ben illuminata.
-2. **Foto ravvicinata della morsettiera**, cioè della fila di viti dove si
-   collegano i fili, con **le scritte leggibili**. Se le scritte sono sotto i
-   fili, fotografa da più angolazioni.
-3. **Foto di eventuali interruttorini (DIP switch) e manopoline (trimmer)**
-   con le loro scritte.
-4. **Foto dell'etichetta** con modello e dati del motore e della scheda.
-5. Il **manuale**, se ce l'hai, anche in inglese o come foto delle pagine.
-   Spesso è un PDF che il venditore manda su richiesta.
-6. Il **telecomando**: quanti tasti ha e cosa fa ciascuno?
-7. I risultati delle misure del punto 3, se riesci a farle.
-
-## 4.2 Come leggere la morsettiera (senza toccare nulla)
-
-Sulle schede per cancelli scorrevoli i morsetti dei comandi hanno di solito
-sigle come queste. Le elenco solo perché tu sappia cosa cercare: **non so
-ancora quali ha la tua scheda.**
-
-| Sigle possibili | Significato abituale |
-|---|---|
-| OPEN, APRE, AP | ingresso comando "apri" |
-| CLOSE, CHIUDE, CH | ingresso comando "chiudi" |
-| STOP | ingresso "stop" (spesso **normalmente chiuso**: va tenuto collegato a COM, e lo stop avviene "aprendo" il collegamento) |
-| SBS, PP, STEP, P/P, K | "passo-passo": un solo tasto che fa apri → stop → chiudi → stop… |
-| PED | apertura pedonale (parziale) |
-| COM, GND, ⏚ | comune dei comandi |
-| PHO, FOTO, FT | fotocellule |
-| LAMP, FLASH | lampeggiante (spesso **230 V!**) |
-| 12V, 24V, +, − | uscita di alimentazione per accessori |
-| L, N, AC 220V | alimentazione a **230 V ⚡** |
-| M, MOT, U V W, CAP | motore e condensatore, a **230 V ⚡** |
-
-## 4.3 Le misure (tensione e tipo degli ingressi)
-
-**Attrezzo:** multimetro digitale ("tester").
-
-1. Ruota la manopola del tester su **V con la linea dritta e i puntini**
-   (tensione continua, "V⎓" o "DCV"), portata **20 V** se il tuo tester non
-   sceglie da solo la portata.
-2. Puntale **nero** nella presa "COM" del tester, puntale **rosso** nella
-   presa "V".
-3. A scheda accesa (con l'elettricista presente), appoggia:
-   - il puntale nero sul morsetto **COM** (o GND) **dei comandi**;
-   - il puntale rosso, uno alla volta, sui morsetti **OPEN**, **CLOSE**,
-     **STOP** (o quelli che hai trovato).
-4. Annota il numero che leggi per ciascuno.
-
-**Come interpretare i numeri:**
-
-| Leggi | Significa | Relè adatti |
+| # | Contenuto | Leggibilità |
 |---|---|---|
-| Tra 3 e 30 V circa | Ingresso a bassa tensione, a "contatto pulito": basta unire quel morsetto con COM per dare il comando. È il caso più comune. | Il modulo relè della lista (A3) va bene. |
-| 0 V su STOP, ma un valore su OPEN/CLOSE | Probabilmente lo STOP è "normalmente chiuso" e c'è già un ponticello. | Si userà il contatto NC del relè 3. |
-| Più di 30 V, o valori alternati | **Fermati.** Potrebbe essere un ingresso ad alta tensione. | Niente modulo economico: decide l'elettricista. |
+| 1 | Manuale: telecomando, abbinamento, "Use a function" | Buona. La pagina è tagliata in basso ("The LED flicker once…") e a destra |
+| 2 | Manuale: schema della scheda con le didascalie | Buona per le didascalie; le scritte sulla scheda nella foto del manuale sono illeggibili |
+| 3 | Manuale: "Motor wiring diagram" (P6) | Buona |
+| 4 | Scheda vera: parte in alto a sinistra (tasto di apprendimento, potenziometro, DIP) | **Scura e sfocata** |
+| 5 | Targhetta del motore | Buona |
 
-**Facoltativo, solo se hai letto 3-30 V e con l'elettricista:** prova il
-comando a mano. Togli prima il motore dalla cremagliera con la **chiave di
-sblocco manuale** (così il motore gira "a vuoto" e il tetto non si muove).
-Poi unisci per un attimo, con un filo isolato, il morsetto OPEN con COM:
-il motore deve partire. Ripeti con CLOSE e con STOP.
+**Non sono arrivate** la foto della scheda intera e quella dei morsetti, cioè
+quella con la scritta ABM241. Quindi **non ho visto con i miei occhi** il
+morsetto verde, i morsetti "+15V out / GND / Photo / OPN / test" e il
+connettore "Limit". Per questi uso le tue letture e il manuale, e le tratto
+come ipotesi.
 
-## 4.4 Impostazioni della scheda da controllare (con il manuale)
+## 4.2 Cosa ho letto (e quanto ne sono sicuro)
 
-| Funzione | Come deve essere | Perché |
+**Targhetta del motore** (foto 5), lettura sicura:
+
+- Modello **MD370**
+- Potenza **370 W**
+- Alimentazione **AC 240 V~ 50 Hz**
+- Corrente di spunto **3 A**
+- Velocità del motore 1400 giri/min
+- Velocità di traslazione **12 m/min** (cioè 0,2 m/s)
+
+**Telecomando** (foto 1, manuale), lettura sicura:
+
+- 4 tasti:
+  - **Open** (▲, in alto a sinistra)
+  - **close** (▼, in alto a destra)
+  - **Stop** (■, in basso a destra)
+  - **No use** (●, in basso a sinistra)
+- 433 MHz, chip EV1527, pila 27A da 12 V.
+- Tenendo premuto un tasto per più di 4 secondi, il telecomando smette di
+  trasmettere.
+- Risposta alla mia domanda di prima: il telecomando ha **tasti separati**
+  per aprire, chiudere e fermare.
+
+**Schema della scheda nel manuale** (foto 2), didascalie leggibili:
+
+| Didascalia nel manuale | Mia interpretazione | Sicurezza |
 |---|---|---|
-| **Richiusura automatica** (auto-close, "TCA", "pausa") | **DISATTIVATA** | Altrimenti il tetto si richiude da solo dopo qualche secondo! |
-| Rilevamento ostacoli / sensibilità di forza | Attivo, tarato basso | Se qualcosa blocca il tetto, il motore si ferma. |
-| Finecorsa della scheda (magneti o molle sulla cremagliera) | Regolati in modo da fermare il tetto **un po' oltre** i nostri finecorsa | Sono la protezione meccanica contro il fine binario. |
-| Tempo di lavoro | Poco più della corsa reale | Seconda protezione "a tempo", indipendente dall'Arduino. |
-| Fotocellule | Se non le usi, l'ingresso va ponticellato come dice il manuale | Altrimenti la scheda può rifiutare la chiusura. |
-| Rallentamento a fine corsa (soft stop) | Se c'è, attivo | Meno urti sul tetto. |
+| "1.2 Output 15 VDC, 30 mA" | Tra i morsetti 1 e 2 c'è un'uscita a 15 V per gli accessori | media |
+| "2.3 infrared" | Tra 2 e 3: fotocellula ("Photo") | media |
+| "2.4 Open" | Tra 2 e 4: comando apri ("OPN") | media |
+| "2.5 cycle" | Tra 2 e 5: comando "ciclico" passo-passo (forse il tuo "test") | media |
+| Morsetto 2 | **Comune** degli ingressi (il tuo "GND") | media |
+| "Lights AC220V" con la freccia verso un **morsetto verde** | Uscita per il **lampeggiante a 230 V** | **⚠️ in conflitto con la tua lettura** |
+| "1.ON open the Soft start / 1.OFF Off Soft start" | DIP 1 = avvio lento | buona |
+| "Autoclosing 2ON3OFF/5S, 2OFF3ON/10S, 2ON3ON/20S" | DIP 2 e 3 = richiusura automatica dopo 5, 10 o 20 s | buona; **manca 2OFF3OFF** |
+| "4.ON/Resista" | DIP 4 = rilevamento ostacoli ("resistenza") | media |
+| "Resistance to adjust" | Potenziometro di regolazione della forza/ostacolo | media |
+| "Single limit and double limit" | Selettore uno/due finecorsa (il tuo "one/two Limt") | buona |
+| "turns forward and backward" | Selettore del verso del motore (il tuo "Motor Rotation") | buona |
+| "limit", "motor" | Connettori del finecorsa e del motore | buona |
+| "fuse 10A/250" | Fusibile da 10 A | buona |
+| "The power of 220V/50HZ" | Alimentazione di rete ⚡ | buona |
+| "Learn key: 40 PCS" | Fino a 40 telecomandi | buona |
 
-## 4.5 Quale relè: il ragionamento
+**Scheda vera, foto 4** (scura):
 
-- I relè del modulo A3 sopportano fino a 10 A a 250 V / 30 V continui. Per
-  "premere un tasto" a 12-24 V con pochi milliampere sono più che
-  sufficienti.
-- Con correnti piccolissime, i contatti normali (in argento) a volte nel
-  tempo diventano poco affidabili. Se al collaudo un comando ogni tanto non
-  viene ricevuto, si passa a relè con **contatti dorati**, adatti ai piccoli
-  segnali.
-- Il modulo ha gli **optoisolatori**, cioè una separazione elettrica tra
-  Arduino e relè. Protegge l'Arduino dai disturbi che arrivano dalla scheda
-  del cancello.
+- Scritte: "8S Let go of the Key Delete the code", "1S Enter learning key",
+  il tasto K1, il potenziometro con la scritta **"Closing Obstruction"** e una
+  freccia "+", il DIP rosso a 4 posizioni numerate 1-4.
+- Posizione dei DIP: **mi sembra** che la levetta 1 e la 4 siano da una
+  parte, la 2 e la 3 dall'altra. Ma la scritta "ON" non si vede, quindi
+  **non so quale lato sia ON**.
 
-## 4.6 E se la scheda fosse "difficile"?
+**Schema del motore** (foto 3): una morsettiera a 7 posizioni con terra
+("Ground line"), comune ("Public line"), due fili di direzione ("Direction
+line") e tre fili del finecorsa ("Limit line"). Tutti i fili del motore
+sono **a 230 V ⚡**, tranne forse il finecorsa: non è indicato.
 
-Se la morsettiera non avesse ingressi separati per apri e chiudi (solo
-"passo-passo"), o se fosse illeggibile, c'è un'alternativa che funziona
-**sempre**: collegare i relè **in parallelo ai tasti di un telecomando di
-scorta**. Il telecomando va a pila, a 3-12 V, ed è quindi sicuro. Lo si apre
-e si saldano due fili ai capi di ogni tasto. Se servirà, ti guiderò passo
-passo.
+## 4.3 Cosa non si legge o non è chiaro
+
+1. **Il morsetto verde a tre posizioni.** Tu leggi "open / stop / close".
+   Nel manuale, invece, la didascalia "Lights AC220V" (lampeggiante a 230 V)
+   punta proprio a un morsetto verde. Le possibilità sono due:
+   - la tua scheda è una versione diversa da quella del manuale;
+   - sulla scheda ci sono due morsetti verdi.
+
+   **Finché non è chiarito, va trattato come se avesse 230 V** (ipotesi H4).
+2. **Ingressi "chiudi" e "stop".** Nella morsettiera a 5 posizioni descritta
+   dal manuale **non ci sono** ingressi separati per chiudere e fermare: solo
+   "Open" (2-4) e "cycle" (2-5). Gli ingressi separati esistono solo se il
+   morsetto verde è davvero "open / stop / close" a bassa tensione.
+3. **"test" o "cycle"?** Tu leggi "test" sul quinto morsetto, il manuale
+   scrive "cycle". Potrebbe essere lo stesso ingresso, cioè apri → stop →
+   chiudi → stop a ogni impulso. **Non useremo questo ingresso per il
+   tetto**: con un solo tasto non si sa mai in che verso partirà.
+4. **Il potenziometro.** Sulla scheda c'è scritto "Closing Obstruction",
+   cioè sensibilità agli ostacoli. Il manuale (foto 1, punto 4) dice invece
+   che il potenziometro regola la **richiusura automatica** ("Turn
+   counterclockwise to minimum close automatic door closing"). Le due
+   informazioni sono in contrasto.
+5. **Richiusura automatica spenta.** Il manuale elenca solo tre combinazioni
+   dei DIP 2-3, tutte con un tempo (5, 10, 20 s). Non dice che 2 OFF + 3 OFF
+   la disattiva. **È fondamentale verificarlo**: una richiusura automatica
+   attiva chiuderebbe il tetto da sola dopo l'apertura.
+6. **Che cosa succede dopo un blackout.** Il manuale dice "the controller is
+   turned on after the power is off. First of all, execute the turn on"
+   (punto 2) e "the door must be pushed to the middle during installation"
+   (punto 1). Sembra significare che, al ritorno della corrente, la scheda
+   non sa dov'è il cancello e il primo comando potrebbe muoverlo in un verso
+   inatteso. Da verificare al collaudo, con il tetto sorvegliato.
+7. **Cancellazione dei codici.** Il manuale dice 12 secondi, la scheda dice
+   8. Non ha importanza per noi, ma conferma che manuale e scheda non
+   corrispondono del tutto.
+8. **Pagine mancanti.** Mancano la pagina successiva a "Power supply test" e
+   le pagine sui morsetti e sulle fotocellule.
+9. **Ingresso "Photo".** Non sappiamo se è normalmente chiuso o aperto, né
+   se oggi c'è un ponticello.
+10. **Sigla ABM241.** Non ho trovato documentazione pubblica di questa
+    scheda, solo di schede simili. Per questo non uso nessuna informazione
+    "presa da internet" come certa.
+
+## 4.4 Le due strade possibili (decideremo con i dati)
+
+Lo sketch dell'Arduino è **lo stesso** nei due casi: tre relè, cioè tre
+"pulsanti" APRI, CHIUDI e STOP. Cambiano solo i fili e qualche valore in
+`arduino/tetto/configurazione_scheda.h`.
+
+**Strada A — ingressi della scheda (preferita).** Vale **se** il morsetto
+verde risulta "open / stop / close" a bassa tensione:
+
+- i tre relè vanno ai tre ingressi;
+- il comune va al morsetto indicato dalle misure, probabilmente il 2 (GND).
+
+**Strada B — telecomando di scorta in parallelo.** Vale **se** il morsetto
+verde è il lampeggiante a 230 V, oppure se gli ingressi non sono
+utilizzabili:
+
+- si abbina alla scheda un **secondo telecomando** uguale;
+- lo si apre e si collegano i relè ai tasti Open, close e Stop.
+
+Il telecomando funziona a pila (12 V), quindi è a bassa tensione e
+isolato dalla scheda. Lo svantaggio è che passa via radio. Se un comando
+non arriva, però, l'Arduino se ne accorge ("il tetto non è partito") e
+blocca tutto.
+
+In **nessun caso** si userà l'ingresso "cycle" passo-passo, e in nessun caso
+l'Arduino verrà collegato direttamente ai morsetti della scheda.
+
+## 4.5 Quale relè
+
+- **Strada A.** Gli ingressi sono probabilmente alimentati dai 15 V della
+  scheda, con correnti di pochi milliampere. Il modulo a 4 relè della lista
+  va bene. Per correnti così piccole sono ancora più affidabili i relè con
+  **contatti dorati** (vedi la lista della spesa, voce A3).
+- **Strada B.** I tasti del telecomando lavorano con correnti piccolissime:
+  anche qui vanno bene, e anzi sono preferibili, i contatti dorati.
+- **In entrambi i casi:** se le misure dessero più di 30 V, o tensione
+  alternata, ci si ferma e decide l'elettricista.
