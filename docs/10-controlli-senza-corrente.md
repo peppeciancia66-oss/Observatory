@@ -70,23 +70,47 @@ Stampa questa pagina e scrivi le risposte direttamente sul foglio.
 - **Perché:** molte schede richiedono un ponticello sulla fotocellula per
   poter chiudere (H7).
 
-## C5 — Il morsetto verde a tre posizioni ⚡ (solo guardare)
+## C5 — I due morsetti verdi ⚡ (solo guardare)
+
+> **Aggiornato dopo le foto 6 e 7 del 2 novembre.** Sulla scheda i morsetti
+> verdi sono **due**:
+>
+> - **verde a 3 posizioni**, in basso a sinistra, vicino alla fila
+>   "+15V out / GND / Photo / OPN / test". Accanto si leggono solo l'inizio
+>   delle scritte "ope…", "sto…", "clo…": il resto è coperto dal morsetto.
+>   Nella foto non si vedono fili collegati;
+> - **verde a 2 posizioni**, a destra, vicino al fusibile, ai due relè
+>   grandi e ai morsetti con i fili blu e marrone (fili di corrente). La
+>   scritta accanto è nascosta dal filo nero dell'antenna. Per la posizione
+>   è molto probabilmente l'uscita "Lights AC220V" del manuale, cioè **a 230 V**.
+>
+> Le foto **non bastano** a dire che tensione c'è: lo dirà solo la misura
+> dell'elettricista (E1).
+
+**C5a — Morsetto verde a 3 posizioni ("ope / sto / clo")**
 
 - **Foto:**
-  - ravvicinata del morsetto verde, dritta e di lato, con le scritte
-    stampate vicino;
-  - una foto più larga che mostri **dove** si trova sulla scheda rispetto al
-    fusibile e ai morsetti grossi della corrente.
+  - di lato, **da sinistra** e un po' dall'alto, in modo che si leggano le
+    scritte complete accanto a ciascun polo (oggi si vede solo l'inizio);
+  - una foto dritta del morsetto.
 - **Da annotare:**
-  - quanti morsetti verdi ci sono sulla scheda in tutto;
-  - la scritta esatta accanto a ciascun polo;
-  - se ci sono fili collegati: il loro **spessore** (sottili come quelli di
-    un citofono, o grossi come quelli di una presa?), il **colore** e
-    **dove vanno** (per esempio a un lampeggiante sul cancello).
-- **Perché:** è il punto più importante. Il manuale indica un morsetto verde
-  come "Lights AC220V", cioè l'uscita del lampeggiante **a 230 V**, mentre
-  tu leggi "open / stop / close". Se fosse il lampeggiante, collegarci i
-  relè sarebbe **pericoloso** (H4, H5, H8).
+  - la scritta completa accanto a ciascuno dei tre poli, dall'alto in
+    basso;
+  - se ci sono fili collegati (nella foto 7 non se ne vedono).
+- **Perché:** confermare che sono davvero gli ingressi "open", "stop" e
+  "close" (H4a). Il morsetto **non ha un polo "comune"**: quale sia il
+  comune lo dirà la misura dell'elettricista (H5).
+
+**C5b — Morsetto verde a 2 posizioni vicino al fusibile ⚡ (non toccare)**
+
+- **Foto:** da un'angolazione diversa, in modo che la scritta accanto non
+  sia coperta dal filo nero dell'antenna. **Non spostare il filo**:
+  cambia tu posizione.
+- **Da annotare:**
+  - la scritta;
+  - se ci sono fili collegati e dove vanno (per esempio a un lampeggiante).
+- **Perché:** confermare che è l'uscita del lampeggiante a 230 V (H4b). A
+  questo morsetto **non va mai collegato nulla** dell'automazione del tetto.
 
 ## C6 — Scritte stampate vicino al morsetto verde
 
