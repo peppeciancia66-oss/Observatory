@@ -1,165 +1,166 @@
 # 4. La scheda del cancello (ABM241): cosa sappiamo e cosa no
 
-> ⚠️ **Niente di questa pagina è ancora verificato sulla scheda vera.** Le
-> letture vengono dalle foto del 2 novembre 2026. Non collegare nulla
-> alla scheda finché non sono fatti i controlli di
+> ⚠️ **Niente di questa pagina è ancora verificato con le misure.** Le
+> letture vengono dalle foto del 2 novembre 2026 e dal manuale. Le foto
+> possono confermare **solo ciò che è scritto o visibile**, non le tensioni
+> né il funzionamento.
+>
+> Non collegare nulla alla scheda finché non sono fatti i controlli di
 > [10-controlli-senza-corrente.md](10-controlli-senza-corrente.md) e
-> verificate le ipotesi di [09-ipotesi-da-verificare.md](09-ipotesi-da-verificare.md).
+> verificate le ipotesi di [09-ipotesi-da-verificare.md](09-ipotesi-da-verificare.md),
+> dove trovi lo stato di ciascuna: 📷 "confermato dalla foto" oppure
+> 📏 "da misurare".
+>
+> Tutto ciò che riguarda i **230 V** lo fa un **elettricista** ⚡.
 
 ## 4.1 Le foto ricevute
 
-Delle sette foto annunciate ne ho ricevute **cinque**:
+Le foto ricevute sono **sette**: le prime cinque con il primo messaggio,
+le ultime due (scheda intera e morsetti) con il secondo.
 
 | # | Contenuto | Leggibilità |
 |---|---|---|
-| 1 | Manuale: telecomando, abbinamento, "Use a function" | Buona. La pagina è tagliata in basso ("The LED flicker once…") e a destra |
-| 2 | Manuale: schema della scheda con le didascalie | Buona per le didascalie; le scritte sulla scheda nella foto del manuale sono illeggibili |
+| 1 | Manuale: telecomando, abbinamento, "Use a function" | Buona. Pagina tagliata in basso ("The LED flicker once…") e a destra |
+| 2 | Manuale: schema della scheda con le didascalie | Buona per le didascalie |
 | 3 | Manuale: "Motor wiring diagram" (P6) | Buona |
-| 4 | Scheda vera: parte in alto a sinistra (tasto di apprendimento, potenziometro, DIP) | **Scura e sfocata** |
+| 4 | Scheda vera: parte in alto a sinistra (tasto di apprendimento, potenziometro, DIP) | Scura e sfocata |
 | 5 | Targhetta del motore | Buona |
+| 6 | Scheda vera: fila di morsetti "+15V out … test" e connettore "Limt" | Buona |
+| 7 | Scheda vera: intera | Buona nell'insieme; dettagli piccoli (DIP, scritte vicino ai morsetti verdi) non leggibili con sicurezza |
 
-**Non sono arrivate** la foto della scheda intera e quella dei morsetti, cioè
-quella con la scritta ABM241. Quindi **non ho visto con i miei occhi** il
-morsetto verde, i morsetti "+15V out / GND / Photo / OPN / test" e il
-connettore "Limit". Per questi uso le tue letture e il manuale, e le tratto
-come ipotesi.
-
-## 4.2 Cosa ho letto (e quanto ne sono sicuro)
+## 4.2 Cosa ho letto
 
 **Targhetta del motore** (foto 5), lettura sicura:
 
-- Modello **MD370**
-- Potenza **370 W**
-- Alimentazione **AC 240 V~ 50 Hz**
-- Corrente di spunto **3 A**
-- Velocità del motore 1400 giri/min
-- Velocità di traslazione **12 m/min** (cioè 0,2 m/s)
+- modello **MD370**;
+- potenza **370 W**;
+- alimentazione **AC 240 V~ 50 Hz**;
+- corrente di spunto **3 A**;
+- velocità del motore 1400 giri/min;
+- velocità di traslazione **12 m/min** (0,2 m/s).
 
 **Telecomando** (foto 1, manuale), lettura sicura:
 
-- 4 tasti:
-  - **Open** (▲, in alto a sinistra)
-  - **close** (▼, in alto a destra)
-  - **Stop** (■, in basso a destra)
-  - **No use** (●, in basso a sinistra)
-- 433 MHz, chip EV1527, pila 27A da 12 V.
-- Tenendo premuto un tasto per più di 4 secondi, il telecomando smette di
+- 4 tasti: **Open** (▲, in alto a sinistra), **close** (▼, in alto a
+  destra), **Stop** (■, in basso a destra), **No use** (●, in basso a
+  sinistra);
+- 433 MHz, chip EV1527, pila 27A da 12 V;
+- tenendo premuto un tasto per più di 4 secondi, il telecomando smette di
   trasmettere.
-- Risposta alla mia domanda di prima: il telecomando ha **tasti separati**
-  per aprire, chiudere e fermare.
 
-**Schema della scheda nel manuale** (foto 2), didascalie leggibili:
+**Scheda vera** (foto 6 e 7):
 
-| Didascalia nel manuale | Mia interpretazione | Sicurezza |
+| Dove | Cosa si legge | Note |
 |---|---|---|
-| "1.2 Output 15 VDC, 30 mA" | Tra i morsetti 1 e 2 c'è un'uscita a 15 V per gli accessori | media |
-| "2.3 infrared" | Tra 2 e 3: fotocellula ("Photo") | media |
-| "2.4 Open" | Tra 2 e 4: comando apri ("OPN") | media |
-| "2.5 cycle" | Tra 2 e 5: comando "ciclico" passo-passo (forse il tuo "test") | media |
-| Morsetto 2 | **Comune** degli ingressi (il tuo "GND") | media |
-| "Lights AC220V" con la freccia verso un **morsetto verde** | Uscita per il **lampeggiante a 230 V** | **⚠️ in conflitto con la tua lettura** |
-| "1.ON open the Soft start / 1.OFF Off Soft start" | DIP 1 = avvio lento | buona |
-| "Autoclosing 2ON3OFF/5S, 2OFF3ON/10S, 2ON3ON/20S" | DIP 2 e 3 = richiusura automatica dopo 5, 10 o 20 s | buona; **manca 2OFF3OFF** |
-| "4.ON/Resista" | DIP 4 = rilevamento ostacoli ("resistenza") | media |
-| "Resistance to adjust" | Potenziometro di regolazione della forza/ostacolo | media |
-| "Single limit and double limit" | Selettore uno/due finecorsa (il tuo "one/two Limt") | buona |
-| "turns forward and backward" | Selettore del verso del motore (il tuo "Motor Rotation") | buona |
-| "limit", "motor" | Connettori del finecorsa e del motore | buona |
-| "fuse 10A/250" | Fusibile da 10 A | buona |
-| "The power of 220V/50HZ" | Alimentazione di rete ⚡ | buona |
-| "Learn key: 40 PCS" | Fino a 40 telecomandi | buona |
+| Fila di 5 morsetti a vite, in basso | **+15V out**, **GND**, **Photo**, **OPN**, **test** (da sinistra) | Ben leggibile. Non si vedono fili né ponticelli |
+| Accanto alla fila | **ABM241**, "Date 2024-1…" (data tagliata) | |
+| Connettore bianco a destra della fila | **CL**, **GND**, **OP**, e sotto "**Limt**" | Ha fili collegati; non si vede dove vanno |
+| Connettore successivo | Solo "**M**…" (tagliata) | Fili rossi e nero |
+| **Morsetto verde a 3 posizioni**, in basso a sinistra | Solo l'inizio delle scritte: "**ope**…", "**sto**…", "**clo**…" | Il resto è coperto dal morsetto. Non ha un polo "comune". Non si vedono fili collegati |
+| **Morsetto verde a 2 posizioni**, a destra vicino al fusibile | Scritta **illeggibile**, coperta dal filo nero dell'antenna | Si trova nella zona della corrente: accanto a "**FUSE**", ai due relè grandi, al trasformatore e ai morsetti con fili blu e marrone (dove si legge solo "…**0V**") |
+| Due relè grandi | **HKE JQX15F-90S, 30A 250VAC / 28VDC, COIL 12VDC** | Comandano il motore: zona a 230 V ⚡ |
+| DIP rosso | "**ON**" in alto sul blocchetto e "**DIP**"; numeri **1 2 3 4**. Sopra: "**soft-start**" (1), "**Self closing**" (2-3), "**Obstruction**" (4) | Posizione delle levette **non leggibile con sicurezza** |
+| Tabellina vicino al DIP | "…OFF 5", "OFF ON 10", "ON ON 20" | Tempi della richiusura automatica. La riga "OFF OFF" **non si vede** |
+| Potenziometro | "**Closing Obstruction**" con frecce "+" | |
+| Selettori | "**two / one Limt**" e "**Motor Ro…**" (Motor Rotation) | La posizione dei selettori non è chiara |
+| Pulsanti | **K1** (apprendimento: "1S Enter learning key", "8S Let go of the Key Delete the code") e **K2** "**test**" | |
 
-**Scheda vera, foto 4** (scura):
+**Schema della scheda nel manuale** (foto 2), a confronto con la scheda vera:
 
-- Scritte: "8S Let go of the Key Delete the code", "1S Enter learning key",
-  il tasto K1, il potenziometro con la scritta **"Closing Obstruction"** e una
-  freccia "+", il DIP rosso a 4 posizioni numerate 1-4.
-- Posizione dei DIP: **mi sembra** che la levetta 1 e la 4 siano da una
-  parte, la 2 e la 3 dall'altra. Ma la scritta "ON" non si vede, quindi
-  **non so quale lato sia ON**.
+| Didascalia nel manuale | Sulla scheda vera |
+|---|---|
+| "1.2 Output 15 VDC, 30 mA", "2.3 infrared", "2.4 Open", "2.5 cycle" | Corrisponde alla fila +15V out, GND, Photo, OPN, test, con "test" al posto di "cycle". Il morsetto 2 è "GND" |
+| "Lights AC220V", con freccia verso un morsetto verde | Probabilmente il **morsetto verde a 2 posizioni** vicino al fusibile (lampeggiante a 230 V). È da misurare |
+| "1.ON Soft start" | DIP 1 "soft-start" ✔ |
+| "Autoclosing 2ON3OFF/5S, 2OFF3ON/10S, 2ON3ON/20S" | DIP 2-3 "Self closing" e la tabellina ✔ |
+| "4.ON/Resista" | DIP 4 "Obstruction" ✔ |
+| "Single limit and double limit" | Selettore "two / one Limt" ✔ |
+| "turns forward and backward" | Selettore "Motor Rotation" ✔ |
+| "fuse 10A/250" | Componente "FUSE" ✔ |
 
-**Schema del motore** (foto 3): una morsettiera a 7 posizioni con terra
-("Ground line"), comune ("Public line"), due fili di direzione ("Direction
-line") e tre fili del finecorsa ("Limit line"). Tutti i fili del motore
-sono **a 230 V ⚡**, tranne forse il finecorsa: non è indicato.
+**Schema del motore nel manuale** (foto 3): morsettiera con terra ("Ground
+line"), comune ("Public line"), due fili di direzione ("Direction line") e
+tre fili del finecorsa ("Limit line"). I fili del motore sono **a 230 V** ⚡.
 
-## 4.3 Cosa non si legge o non è chiaro
+## 4.3 Cosa è chiarito e cosa no
 
-1. **Il morsetto verde a tre posizioni.** Tu leggi "open / stop / close".
-   Nel manuale, invece, la didascalia "Lights AC220V" (lampeggiante a 230 V)
-   punta proprio a un morsetto verde. Le possibilità sono due:
-   - la tua scheda è una versione diversa da quella del manuale;
-   - sulla scheda ci sono due morsetti verdi.
+**Chiarito dalle foto:**
 
-   **Finché non è chiarito, va trattato come se avesse 230 V** (ipotesi H4).
-2. **Ingressi "chiudi" e "stop".** Nella morsettiera a 5 posizioni descritta
-   dal manuale **non ci sono** ingressi separati per chiudere e fermare: solo
-   "Open" (2-4) e "cycle" (2-5). Gli ingressi separati esistono solo se il
-   morsetto verde è davvero "open / stop / close" a bassa tensione.
-3. **"test" o "cycle"?** Tu leggi "test" sul quinto morsetto, il manuale
-   scrive "cycle". Potrebbe essere lo stesso ingresso, cioè apri → stop →
-   chiudi → stop a ogni impulso. **Non useremo questo ingresso per il
-   tetto**: con un solo tasto non si sa mai in che verso partirà.
-4. **Il potenziometro.** Sulla scheda c'è scritto "Closing Obstruction",
-   cioè sensibilità agli ostacoli. Il manuale (foto 1, punto 4) dice invece
-   che il potenziometro regola la **richiusura automatica** ("Turn
-   counterclockwise to minimum close automatic door closing"). Le due
-   informazioni sono in contrasto.
-5. **Richiusura automatica spenta.** Il manuale elenca solo tre combinazioni
-   dei DIP 2-3, tutte con un tempo (5, 10, 20 s). Non dice che 2 OFF + 3 OFF
-   la disattiva. **È fondamentale verificarlo**: una richiusura automatica
-   attiva chiuderebbe il tetto da sola dopo l'apertura.
-6. **Che cosa succede dopo un blackout.** Il manuale dice "the controller is
-   turned on after the power is off. First of all, execute the turn on"
-   (punto 2) e "the door must be pushed to the middle during installation"
-   (punto 1). Sembra significare che, al ritorno della corrente, la scheda
-   non sa dov'è il cancello e il primo comando potrebbe muoverlo in un verso
-   inatteso. Da verificare al collaudo, con il tetto sorvegliato.
-7. **Cancellazione dei codici.** Il manuale dice 12 secondi, la scheda dice
-   8. Non ha importanza per noi, ma conferma che manuale e scheda non
-   corrispondono del tutto.
-8. **Pagine mancanti.** Mancano la pagina successiva a "Power supply test" e
-   le pagine sui morsetti e sulle fotocellule.
-9. **Ingresso "Photo".** Non sappiamo se è normalmente chiuso o aperto, né
-   se oggi c'è un ponticello.
-10. **Sigla ABM241.** Non ho trovato documentazione pubblica di questa
-    scheda, solo di schede simili. Per questo non uso nessuna informazione
-    "presa da internet" come certa.
+1. **I morsetti verdi sono due.** Il conflitto con il manuale sembra
+   spiegato: quello a 3 posizioni porta le scritte "ope / sto / clo",
+   mentre la didascalia "Lights AC220V" si riferisce probabilmente a quello
+   a 2 posizioni vicino al fusibile.
+2. **Le scritte della fila a vite** sono +15V out, GND, Photo, OPN, test,
+   nello stesso ordine dello schema del manuale.
+3. **Le funzioni dei DIP** sono scritte sulla scheda: la richiusura
+   automatica si regola con i DIP 2-3 ("Self closing"), non con il
+   potenziometro. Il potenziometro porta la scritta "Closing Obstruction".
 
-## 4.4 Le due strade possibili (decideremo con i dati)
+**Ancora da chiarire (con foto ravvicinate, misure o collaudo):**
+
+1. **Le scritte complete** del morsetto a 3 posizioni: oggi si legge solo
+   l'inizio ("ope", "sto", "clo") (H4a, controllo C5a).
+2. **Le tensioni** dei due morsetti verdi e della fila a vite. Il morsetto
+   a 3 posizioni si trova nella zona a bassa tensione, ma una foto non lo
+   prova. Il morsetto a 2 posizioni, fino alla misura, va trattato **come a
+   230 V** (H3, H4a, H4b, misura E1 dell'elettricista).
+3. **Il comune** del morsetto a 3 posizioni: probabilmente il GND della
+   fila a vite, ma va misurato (H2, H5).
+4. **La posizione dei DIP** e se con 2 e 3 su OFF la richiusura automatica
+   è davvero spenta. La riga "OFF OFF" non si vede nella tabellina (H11,
+   H12, controllo C8, misura E2).
+5. **Il potenziometro.** Il manuale dice che regola la richiusura
+   automatica; la scheda dice "Closing Obstruction" e la richiusura ha i
+   suoi DIP. La versione del manuale è quindi meno probabile, ma non esclusa
+   (H13).
+6. **L'ingresso "test".** Corrisponde probabilmente al "cycle" del manuale
+   (passo-passo) e al pulsante K2 "test". **Non lo useremo per il tetto.**
+7. **L'ingresso "Photo".** Oggi non ha fili né ponticelli: va verificato
+   al collaudo che la scheda chiuda lo stesso (H7).
+8. **Dopo un blackout** la scheda potrebbe non sapere dov'è il tetto (H19,
+   collaudo C.6).
+9. **I selettori** "one/two Limt" e "Motor Rotation": la posizione non è
+   chiara, e comunque **non vanno toccati** (H14).
+10. **Documentazione.** Della ABM241 non ho trovato documentazione
+    pubblica, solo di schede simili. Nessuna informazione "presa da
+    internet" viene usata come certa.
+
+## 4.4 Le due strade possibili (decideremo con le misure)
 
 Lo sketch dell'Arduino è **lo stesso** nei due casi: tre relè, cioè tre
 "pulsanti" APRI, CHIUDI e STOP. Cambiano solo i fili e qualche valore in
 `arduino/tetto/configurazione_scheda.h`.
 
-**Strada A — ingressi della scheda (preferita).** Vale **se** il morsetto
-verde risulta "open / stop / close" a bassa tensione:
+**Strada A — ingressi della scheda.** È la più probabile dopo le foto, ma
+vale **solo se** le misure confermano che il morsetto verde a 3 posizioni è
+"open / stop / close" a bassa tensione:
 
 - i tre relè vanno ai tre ingressi;
-- il comune va al morsetto indicato dalle misure, probabilmente il 2 (GND).
+- il comune va al morsetto indicato dalla misura.
 
-**Strada B — telecomando di scorta in parallelo.** Vale **se** il morsetto
-verde è il lampeggiante a 230 V, oppure se gli ingressi non sono
-utilizzabili:
+**Strada B — telecomando di scorta in parallelo.** Si usa se le misure
+dicono che gli ingressi non sono utilizzabili:
 
 - si abbina alla scheda un **secondo telecomando** uguale;
-- lo si apre e si collegano i relè ai tasti Open, close e Stop.
+- si collegano i relè ai suoi tasti Open, close e Stop.
 
-Il telecomando funziona a pila (12 V), quindi è a bassa tensione e
-isolato dalla scheda. Lo svantaggio è che passa via radio. Se un comando
-non arriva, però, l'Arduino se ne accorge ("il tetto non è partito") e
-blocca tutto.
+Il telecomando funziona a pila (12 V) ed è isolato dalla scheda. Lo
+svantaggio è che passa via radio: se un comando non arriva, però, l'Arduino
+se ne accorge ("il tetto non è partito") e blocca tutto.
 
-In **nessun caso** si userà l'ingresso "cycle" passo-passo, e in nessun caso
-l'Arduino verrà collegato direttamente ai morsetti della scheda.
+**In nessun caso:**
+
+- si usa l'ingresso "test" (passo-passo);
+- si collega qualcosa al morsetto verde a 2 posizioni;
+- si collega l'Arduino direttamente ai morsetti della scheda.
 
 ## 4.5 Quale relè
 
 - **Strada A.** Gli ingressi sono probabilmente alimentati dai 15 V della
   scheda, con correnti di pochi milliampere. Il modulo a 4 relè della lista
-  va bene. Per correnti così piccole sono ancora più affidabili i relè con
-  **contatti dorati** (vedi la lista della spesa, voce A3).
+  va bene; per correnti così piccole sono ancora più affidabili i relè con
+  **contatti dorati** (lista della spesa, voce A3).
 - **Strada B.** I tasti del telecomando lavorano con correnti piccolissime:
-  anche qui vanno bene, e anzi sono preferibili, i contatti dorati.
+  anche qui vanno bene, e sono anzi preferibili, i contatti dorati.
 - **In entrambi i casi:** se le misure dessero più di 30 V, o tensione
   alternata, ci si ferma e decide l'elettricista.

@@ -1,5 +1,62 @@
 # 10. Controlli da fare con la corrente tolta
 
+## In breve: i 3 controlli più importanti dei prossimi 5 giorni
+
+> Stampa questa facciata. Corrente **tolta** (controllo C1) e **niente si
+> sposta**: solo guardare, fotografare e scrivere. Per ogni punto: una foto
+> ben illuminata (luce di lato), ravvicinata, controllata ingrandendola sul
+> telefono prima di mandarla.
+
+**1. I DIP rossi e la richiusura automatica** (il più importante)
+
+- **Foto:** il blocchetto rosso dei DIP, da vicinissimo, con una luce di
+  lato. Si devono leggere la scritta **ON** e i numeri 1-2-3-4.
+- **Annota:** per ogni levetta (1, 2, 3, 4), se è dalla parte di ON oppure
+  no: 1 ____ 2 ____ 3 ____ 4 ____
+- **Foto:** la tabellina stampata vicino ai DIP ("OFF 5", "OFF ON 10",
+  "ON ON 20"…), tutta intera.
+- **Perché:** i DIP 2 e 3 ("Self closing") comandano la **richiusura
+  automatica**. Se fosse accesa, il tetto si richiuderebbe da solo dopo
+  ogni apertura: è il rischio più grande (controllo C8).
+
+**2. Le scritte "ope / sto / clo" e i fili collegati oggi**
+
+- **Foto:** il morsetto verde a **3 posizioni**, fotografato **da sinistra**
+  e un po' dall'alto, in modo che si leggano le scritte **complete** accanto
+  a ogni polo.
+- **Annota:** la scritta completa di ogni polo, dall'alto in basso:
+  ________ / ________ / ________
+- **Annota:** ci sono fili collegati al morsetto verde a 3 posizioni? E alla
+  fila "+15V out / GND / Photo / OPN / test"? Per ognuno: colore e dove va.
+- **Foto:** il morsetto verde a **2 posizioni** vicino al fusibile, da
+  un'angolazione da cui la scritta non sia coperta dal filo dell'antenna.
+  **Non toccarlo e non spostare il filo.**
+- **Perché:** serve a capire a quali ingressi si collegheranno i relè
+  (controlli C3, C4, C5a, C5b).
+
+**3. Cosa chiedere all'elettricista ⚡** (a scheda accesa: solo lui)
+
+Mostragli questa pagina e chiedigli di misurare e scrivere:
+
+- **E1 – Tensioni.** Con il puntale nero sul morsetto **GND** della fila a
+  vite, la tensione (continua e alternata) su: +15V out, Photo, OPN, test,
+  **ognuno dei 3 poli** del morsetto verde "ope / sto / clo", **ognuno dei 2
+  poli** del morsetto verde vicino al fusibile.
+- **E2 – Richiusura automatica.** Con il motore **sbloccato** (chiave di
+  sblocco, così il tetto non si muove): un comando di apertura col
+  telecomando, poi **60 secondi di attesa**. Il motore **non** deve
+  ripartire da solo.
+- **E3 – Sicurezza.** Messa a terra della carcassa del motore, e fase e
+  neutro collegati correttamente.
+
+Quando avrai foto, annotazioni e misure, mandamele: aggiornerò solo
+`configurazione_scheda.h`, lo schema dei collegamenti e lo stato delle
+ipotesi. **Fino ad allora non si collega nulla alla scheda.**
+
+---
+
+## I controlli completi
+
 Questa lista serve a raccogliere i dati che mancano. Per ogni controllo
 trovi **cosa fare**, **quale foto fare o cosa annotare** e **perché serve**
 (tra parentesi le ipotesi di [09-ipotesi-da-verificare.md](09-ipotesi-da-verificare.md)).
